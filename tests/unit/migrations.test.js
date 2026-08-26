@@ -60,6 +60,12 @@ describe('migrateV1', () => {
       'seed-小红书-增长产品实习生--2',
     ]);
     expect(jobs.find((job) => job.id === 'seed-byte-ai-pm')).toMatchObject({ base: '北京 · 海淀' });
+    expect(jobs.filter((job) => job.stage === '已投递').sort((left, right) => left.order - right.order).map((job) => job.id)).toEqual([
+      'seed-openai-product-intern',
+      'seed-openai-product-intern--2',
+      'seed-小红书-增长产品实习生',
+      'seed-小红书-增长产品实习生--2',
+    ]);
     expect(seedVersion).toEqual({ key: 'seedVersion', value: 1 });
   });
 });

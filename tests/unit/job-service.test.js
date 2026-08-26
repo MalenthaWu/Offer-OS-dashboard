@@ -110,4 +110,18 @@ describe('jobService', () => {
     await expect(createJobRepository(db).get('j1')).resolves.toMatchObject({ id: 'j1', stage: '关注' });
     await expect(createActivityRepository(db).list()).resolves.toHaveLength(1);
   });
+
+  it('moves jobs atomically and retains same-stage order without a new activity', async () => {
+    const db = await openTestDatabase();
+    const store = createAppStore();
+    const ids = vi.fn().mockReturnValueOnce('j1').mockReturnValueOnce('a1').mockReturnValueOnce('j2').mockReturnValueOnce('a2');
+    const service = createJobService({ db, store, clock: () => new Date('2026-08-26T08:00:00.000Z'), idFactory: ids });
+
+    await service.create({ company: 'First', position: 'PM' });
+    await service.create({ company: 'Second', position: 'PM' });
+    await service.move('j2', '关注', 'j1');
+
+    expect(store.getState().jobs.filter((job) => job.stage === '关注').map((job) => job.id)).toEqual(['j2', 'j1']);
+    expect(store.getState().activities).toHaveLength(2);
+  });
 });

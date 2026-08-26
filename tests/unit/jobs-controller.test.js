@@ -32,4 +32,32 @@ describe('initJobsController', () => {
     }));
     expect(root.querySelector('.job-card')).not.toBeNull();
   });
+
+  it('cleans up a prior initialization before binding the controller again', async () => {
+    const root = createRoot();
+    const store = createAppStore();
+    const service = { create: vi.fn(), move: vi.fn(), remove: vi.fn() };
+
+    initJobsController({ root, store, service, showToast: vi.fn() });
+    initJobsController({ root, store, service, showToast: vi.fn() });
+    root.querySelector('#add-job-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+
+    await vi.waitFor(() => expect(service.create).toHaveBeenCalledOnce());
+  });
+
+  it('delegates detail and delete actions to persistent handlers', async () => {
+    const root = createRoot();
+    const store = createAppStore({ jobs: [{ id: 'job-1', company: 'OpenAI', position: 'Product Intern', batch: '日常实习', stage: '关注' }] });
+    const detail = vi.fn();
+    const service = { create: vi.fn(), move: vi.fn(), remove: vi.fn().mockResolvedValue(undefined) };
+    root.defaultView.__OFFER_OS_OPEN_JOB_DETAIL__ = detail;
+    root.defaultView.confirm = vi.fn(() => true);
+
+    initJobsController({ root, store, service, showToast: vi.fn() });
+    root.querySelector('[data-job-action="detail"]').click();
+    root.querySelector('[data-job-action="delete"]').click();
+
+    expect(detail).toHaveBeenCalledOnce();
+    await vi.waitFor(() => expect(service.remove).toHaveBeenCalledWith('job-1'));
+  });
 });

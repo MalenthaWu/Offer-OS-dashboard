@@ -42,6 +42,14 @@ function jobFromInput(input, { id, createdAt, updatedAt }) {
   };
 }
 
+function sortStageJobs(jobs, stage) {
+  return jobs.filter((job) => job.stage === stage).sort((left, right) => {
+    const leftOrder = Number.isFinite(left.order) ? left.order : Number.MAX_SAFE_INTEGER;
+    const rightOrder = Number.isFinite(right.order) ? right.order : Number.MAX_SAFE_INTEGER;
+    return leftOrder - rightOrder || left.createdAt.localeCompare(right.createdAt) || left.id.localeCompare(right.id);
+  });
+}
+
 export function createJobService({ db, store, clock = () => new Date(), idFactory = () => crypto.randomUUID() }) {
   const jobs = createJobRepository(db);
   const activities = createActivityRepository(db);
@@ -55,11 +63,14 @@ export function createJobService({ db, store, clock = () => new Date(), idFactor
   async function create(input) {
     const occurredAt = toISO(clock);
     const jobId = idFactory();
-    const job = jobFromInput(input, { id: jobId, createdAt: occurredAt, updatedAt: occurredAt });
+    let job = jobFromInput(input, { id: jobId, createdAt: occurredAt, updatedAt: occurredAt });
     const activity = activityForStage({ id: idFactory(), jobId, stage: job.stage, occurredAt });
 
     await runTransaction(db, ['jobs', 'activities'], 'readwrite', async (tx) => {
-      tx.objectStore('jobs').put(job);
+      const jobsStore = tx.objectStore('jobs');
+      const existing = await requestToPromise(jobsStore.getAll());
+      job = { ...job, order: sortStageJobs(existing, job.stage).length };
+      jobsStore.put(job);
       tx.objectStore('activities').put(activity);
     });
     await reload();
@@ -90,24 +101,41 @@ export function createJobService({ db, store, clock = () => new Date(), idFactor
   }
 
   async function changeStage(id, stage) {
+    return move(id, stage);
+  }
+
+  async function move(id, stage, beforeId = null) {
     const occurredAt = toISO(clock);
-    const type = activityByStage[stage];
-    if (!type) throw new Error(`Unknown job stage: ${stage}`);
-    let job;
+    if (!activityByStage[stage]) throw new Error(`Unknown job stage: ${stage}`);
+    let moved;
 
     await runTransaction(db, ['jobs', 'activities'], 'readwrite', async (tx) => {
       const jobsStore = tx.objectStore('jobs');
-      const current = await requestToPromise(jobsStore.get(id));
+      const allJobs = await requestToPromise(jobsStore.getAll());
+      const current = allJobs.find((job) => job.id === id);
       if (!current) throw new Error(`Job not found: ${id}`);
 
-      job = { ...current, stage, updatedAt: occurredAt, schemaVersion: SCHEMA_VERSION };
-      jobsStore.put(job);
-      tx.objectStore('activities').put(activityForStage({
-        id: idFactory(), jobId: id, stage, occurredAt,
+      const sourceJobs = sortStageJobs(allJobs, current.stage).filter((job) => job.id !== id);
+      const destinationJobs = current.stage === stage ? sourceJobs : sortStageJobs(allJobs, stage);
+      const beforeIndex = beforeId ? destinationJobs.findIndex((job) => job.id === beforeId) : -1;
+      const insertionIndex = beforeIndex < 0 ? destinationJobs.length : beforeIndex;
+      moved = { ...current, stage, updatedAt: occurredAt, schemaVersion: SCHEMA_VERSION };
+      destinationJobs.splice(insertionIndex, 0, moved);
+
+      const orderedStages = current.stage === stage
+        ? [[stage, destinationJobs]]
+        : [[current.stage, sourceJobs], [stage, destinationJobs]];
+      orderedStages.forEach(([, stageJobs]) => stageJobs.forEach((job, order) => {
+        const next = { ...job, order, updatedAt: job.id === id ? occurredAt : job.updatedAt, schemaVersion: SCHEMA_VERSION };
+        if (job.id === id) moved = next;
+        jobsStore.put(next);
       }));
+      if (current.stage !== stage) {
+        tx.objectStore('activities').put(activityForStage({ id: idFactory(), jobId: id, stage, occurredAt }));
+      }
     });
     await reload();
-    return job;
+    return moved;
   }
 
   async function remove(id) {
@@ -122,5 +150,5 @@ export function createJobService({ db, store, clock = () => new Date(), idFactor
     await reload();
   }
 
-  return { create, update, changeStage, remove, reload };
+  return { create, update, changeStage, move, remove, reload };
 }

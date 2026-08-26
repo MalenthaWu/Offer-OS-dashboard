@@ -1,3 +1,5 @@
+import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
+
 (() => {
       const $ = (selector, root = document) => root.querySelector(selector);
       const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -84,8 +86,6 @@
         showToast('已整理格式，内容未删改');
       });
 
-      const filterJobs = () => {};
-
       if (!window.__OFFER_OS_FEATURES__?.jobs) {
       $('#add-job-form').addEventListener('submit', (event) => {
         event.preventDefault();
@@ -138,6 +138,7 @@
         activateSection('jobs');
         showToast(`${company} · ${position} 已加入岗位池`);
       });
+      }
 
       $$('[data-job-view]').forEach(button => button.addEventListener('click', () => {
         $$('[data-job-view]').forEach(item => item.classList.toggle('active', item === button));
@@ -167,6 +168,7 @@
       $('#batch-filter').addEventListener('change', filterJobs);
       $('#more-filter').addEventListener('click', () => showToast('当前演示支持关键词与批次筛选'));
 
+      if (!window.__OFFER_OS_FEATURES__?.jobs) {
       // ---- 看板卡片精简：移除收藏/底部按钮、状态徽标移至右上角、加删除 ----
       const STATUS_RE = /(笔试|测评|一面|二面|三面|HR\s*面|终面|AI\s*面|Offer|流程结束|已归档|拒信|放弃)/;
       const STAGE_CLASS = { '关注': 'badge-gray', '已投递': 'badge-blue', '已测评': 'badge-butter', '面试中': 'badge-lilac', '已结束': 'badge-mint' };
@@ -563,6 +565,61 @@
       };
       window.__OFFER_OS_OPEN_JOB_DETAIL__ = openPersistentJobDetail;
 
+      if (window.__OFFER_OS_FEATURES__?.jobs) {
+        const deleteTableRow = (row) => {
+          const name = `${row.dataset.company || ''} ${row.dataset.position || ''}`.trim();
+          if (!confirm(`确定删除「${name}」？`)) return;
+          row.classList.add('removing');
+          setTimeout(() => { row.remove(); filterJobs(); showToast(`已删除：${name}`); }, 160);
+        };
+        const cleanupTable = () => {
+          const table = document.querySelector('#job-table-body').closest('table');
+          const favoriteHeader = [...table.querySelectorAll('thead th')].find((header) => header.textContent.trim() === '收藏');
+          if (favoriteHeader) favoriteHeader.textContent = '操作';
+          $$('#job-table-body tr[data-job-search]').forEach((row) => {
+            const favoriteCell = [...row.children].find((cell) => cell.textContent.trim() === '★' || cell.textContent.trim() === '☆');
+            if (!favoriteCell) return;
+            favoriteCell.replaceChildren(); favoriteCell.className = 'mono';
+            const remove = document.createElement('button');
+            remove.type = 'button'; remove.className = 'table-job-delete'; remove.title = '删除'; remove.setAttribute('aria-label', `删除 ${row.dataset.company || ''} ${row.dataset.position || ''}`);
+            remove.addEventListener('click', (event) => { event.stopPropagation(); deleteTableRow(row); });
+            favoriteCell.appendChild(remove);
+          });
+        };
+        const bindSupportingActions = () => {
+          $$('[data-toast]:not([data-bound])').forEach((button) => { button.dataset.bound = 'true'; button.addEventListener('click', () => showToast(button.dataset.toast)); });
+          $$('[data-view-jd]:not([data-bound])').forEach((button) => {
+            button.dataset.bound = 'true';
+            button.addEventListener('click', () => {
+              const card = button.closest('[data-job-search]');
+              $('#jd-dialog-title').textContent = `${card.dataset.company || ''} · ${card.dataset.position || ''}`;
+              $('#jd-view').textContent = card.dataset.jdFormatted || card.dataset.jdRaw || '（该岗位暂无 JD）';
+              const dialog = $('#jd-dialog'); if (typeof dialog.showModal === 'function') dialog.showModal(); else dialog.setAttribute('open', '');
+            });
+          });
+          $$('[data-view-jd-row]:not([data-bound])').forEach((button) => {
+            button.dataset.bound = 'true';
+            button.addEventListener('click', (event) => {
+              event.stopPropagation(); const row = button.closest('[data-job-search]');
+              $('#jd-dialog-title').textContent = `${row.dataset.company || ''} · ${row.dataset.position || ''}`;
+              $('#jd-view').textContent = getJDForJob(row.dataset.company || '', row.dataset.position || '');
+              const dialog = $('#jd-dialog'); if (typeof dialog.showModal === 'function') dialog.showModal(); else dialog.setAttribute('open', '');
+            });
+          });
+          $$('[data-mock-job]:not([data-bound])').forEach((button) => {
+            button.dataset.bound = 'true';
+            button.addEventListener('click', () => {
+              const option = [...$('#interview-job').options].find((item) => button.dataset.mockJob.includes(item.textContent.split(' · ')[0]));
+              if (option) $('#interview-job').value = option.value;
+              activateSection('interview'); showToast('已带入当前岗位，准备开始模拟');
+            });
+          });
+        };
+        cleanupTable();
+        $$('.library-row .library-favorite').forEach((button) => button.remove());
+        bindSupportingActions();
+      }
+
       const calendarEvents = [
         { date: '2026-07-29', title: '暑期岗位复盘', time: '20:00', type: 'task' },
         { date: '2026-08-03', title: '更新重点岗位池', time: '09:30', type: 'task' },
@@ -752,7 +809,31 @@
         }, 180);
       }));
       $('#sync-jobs').addEventListener('click', () => showToast('飞书多维表格已同步'));
-      $('#refresh-library').addEventListener('click', (event) => { event.currentTarget.querySelector('svg').style.transform = 'rotate(180deg)'; setTimeout(() => event.currentTarget.querySelector('svg').style.transform = '', 400); showToast('已获取 6 条最新机会'); });
+      $('#refresh-library').addEventListener('click', (event) => { event.currentTarget.querySelector('svg').style.transform = 'rotate(180deg)'; setTimeout(() => event.currentTarget.querySelector('svg').style.transform = '', 400); showToast('已获取 6 条最新机会'); filterJobs(); });
+
+      // ---- 实习信息搜集：按求职者自定义方向搜集 ----
+      const $internDirection = $('#intern-direction');
+      const $internCollect = $('#intern-collect');
+      const $internCurrent = $('#intern-current');
+      const runDirectionCollect = () => {
+        const dir = (($internDirection && $internDirection.value) || '').trim();
+        const $search = $('#job-search'); if ($search) $search.value = dir;
+        filterJobs();
+        if (!dir) {
+          if ($internCurrent) { $internCurrent.textContent = '当前搜集方向：未限定（展示全部来源）'; $internCurrent.classList.add('badge-gray'); $internCurrent.classList.remove('badge-blue'); }
+          showToast('已清除方向限定，展示全部来源');
+          return;
+        }
+        if ($internCurrent) { $internCurrent.textContent = '当前搜集方向：' + dir; $internCurrent.classList.remove('badge-gray'); $internCurrent.classList.add('badge-blue'); }
+        const visible = $$('.job-view.active [data-job-search]').filter((el) => el.style.display !== 'none').length;
+        showToast('已按「' + dir + '」方向筛选 ' + visible + ' 条机会');
+      };
+      if ($internCollect) $internCollect.addEventListener('click', runDirectionCollect);
+      if ($internDirection) $internDirection.addEventListener('keydown', (e) => { if (e.key === 'Enter') runDirectionCollect(); });
+      $$('#intern-chips .direction-chip').forEach((chip) => chip.addEventListener('click', () => {
+        if ($internDirection) $internDirection.value = chip.dataset.direction || '';
+        runDirectionCollect();
+      }));
 
       const resumes = {
         byte: { role: 'AI 产品经理实习生 · 2027 届', company: '某头部内容平台 · AI 产品实习生', score: '86', experience: '<li>围绕 AI 搜索场景完成 18 次用户访谈，提炼 4 类核心意图并推动召回策略迭代。</li><li>搭建“曝光—点击—采纳”效果漏斗，定位回答采纳率瓶颈，推动核心指标提升 12.6%。</li><li>协同算法、设计和研发完成 3 个版本迭代，独立输出 PRD、埋点方案与上线复盘。</li>', skills: '产品：需求分析 / 用户研究 / PRD / 原型设计　数据：SQL / Excel / A/B Test　AI：RAG / 模型评测基础　工具：Figma / 飞书多维表格 / Python' },
@@ -1084,10 +1165,7 @@
       $('#generate-from-job').addEventListener('click', () => {
         genList.innerHTML = ''; selectedJobCard = null; $('#gen-job-confirm').disabled = true;
         document.querySelectorAll('#kanban-board .job-card').forEach(card => {
-          const company = card.dataset.company || ''; const position = card.dataset.position || '';
-          const logo = card.querySelector('.company-logo');
-          const row = document.createElement('button'); row.type = 'button'; row.className = 'gen-job-row';
-          row.innerHTML = `<span class="company-logo" style="${logo ? logo.getAttribute('style') : ''}">${logo ? logo.textContent : (company.slice(0, 1) || '?')}</span><span class="gj-title"><strong>${company} · ${position}</strong><span>${card.querySelector('.job-title span') ? card.querySelector('.job-title span').textContent : ''}</span></span>`;
+          const row = createResumeJobOption(card);
           row.addEventListener('click', () => { selectedJobCard = card; genList.querySelectorAll('.gen-job-row').forEach(r => r.classList.toggle('active', r === row)); $('#gen-job-confirm').disabled = false; });
           genList.appendChild(row);
         });

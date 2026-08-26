@@ -39,7 +39,15 @@ function failureMessage(error) {
   return `保存失败：${error instanceof Error ? error.message : '未知错误'}`;
 }
 
+function beforeJobId(column, jobId, clientY) {
+  const cards = [...column.querySelectorAll(':scope > .job-card')].filter((card) => card.dataset.id !== jobId);
+  if (!Number.isFinite(clientY)) return null;
+  const nextCard = cards.find((card) => clientY < card.getBoundingClientRect().top + card.getBoundingClientRect().height / 2);
+  return nextCard?.dataset.id ?? null;
+}
+
 export function initJobsController({ root, store, service, showToast }) {
+  root.__OFFER_OS_JOBS_CLEANUP__?.();
   const board = root.querySelector('#kanban-board');
   const form = root.querySelector('#add-job-form');
   const search = root.querySelector('#job-search');
@@ -63,14 +71,15 @@ export function initJobsController({ root, store, service, showToast }) {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    const input = formInput(event.currentTarget);
+    const submittedForm = event.currentTarget;
+    const input = formInput(submittedForm);
     if (!input.company || !input.position) return;
 
     try {
       await service.create(input);
-      const dialog = event.currentTarget.closest('dialog');
+      const dialog = submittedForm.closest('dialog');
       dialog?.close?.();
-      event.currentTarget.reset();
+      submittedForm.reset();
     } catch (error) {
       onFailure(error);
     }
@@ -118,11 +127,12 @@ export function initJobsController({ root, store, service, showToast }) {
     event.preventDefault();
     const jobId = draggedJobId || event.dataTransfer?.getData('text/plain');
     const stage = column.dataset.stage;
+    const beforeId = beforeJobId(column, jobId, event.clientY);
     onDragEnd();
     if (!jobId || !stage) return;
 
     try {
-      await service.changeStage(jobId, stage);
+      await service.move(jobId, stage, beforeId);
     } catch (error) {
       onFailure(error);
     }
@@ -142,7 +152,7 @@ export function initJobsController({ root, store, service, showToast }) {
   const unsubscribe = store.subscribe('jobs:changed', render);
   render();
 
-  return () => {
+  const cleanup = () => {
     form?.removeEventListener('submit', onSubmit);
     board?.removeEventListener('click', onBoardClick);
     board?.removeEventListener('dragstart', onDragStart);
@@ -152,4 +162,6 @@ export function initJobsController({ root, store, service, showToast }) {
     unsubscribe();
     if (root.defaultView?.__OFFER_OS_REMOVE_JOB__) delete root.defaultView.__OFFER_OS_REMOVE_JOB__;
   };
+  root.__OFFER_OS_JOBS_CLEANUP__ = cleanup;
+  return cleanup;
 }

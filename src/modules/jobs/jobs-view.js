@@ -110,7 +110,11 @@ export function renderJobs(root, jobs) {
     column.querySelectorAll(':scope > .job-card').forEach((card) => card.remove());
   });
 
-  jobs.forEach((job) => {
+  jobs.slice().sort((left, right) => {
+    const leftOrder = Number.isFinite(left.order) ? left.order : Number.MAX_SAFE_INTEGER;
+    const rightOrder = Number.isFinite(right.order) ? right.order : Number.MAX_SAFE_INTEGER;
+    return leftOrder - rightOrder || String(left.createdAt || '').localeCompare(String(right.createdAt || '')) || String(left.id).localeCompare(String(right.id));
+  }).forEach((job) => {
     const column = columns.find((candidate) => candidate.dataset.stage === (job.stage || '关注'));
     if (!column) return;
     column.insertBefore(createJobCard(job), column.querySelector(':scope > .add-card'));

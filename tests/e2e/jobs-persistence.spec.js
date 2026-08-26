@@ -22,13 +22,22 @@ async function dragJobToStage(page, jobId, stage) {
   await source.dispatchEvent('dragend', { dataTransfer });
 }
 
+async function addJob(page, company, position) {
+  await page.getByRole('button', { name: '添加岗位' }).first().click();
+  await page.locator('#new-company').fill(company);
+  await page.locator('#new-position').fill(position);
+  await page.locator('#add-job-form').getByRole('button', { name: '加入岗位池' }).click();
+  await expect(page.locator('#add-job-dialog')).toBeHidden();
+  const card = page.locator('.job-card').filter({ hasText: company }).filter({ hasText: position });
+  await expect(card).toHaveCount(1);
+  return card.getAttribute('data-id');
+}
+
 test('keeps created jobs and stage changes after reload', async ({ page }) => {
   await completeDemoLogin(page);
   await page.locator('.nav-item[data-section="jobs"]').click();
-  await page.getByRole('button', { name: '添加岗位' }).first().click();
-  await page.locator('#new-company').fill('OpenAI');
-  await page.locator('#new-position').fill('Product Intern');
-  await page.locator('#add-job-form').getByRole('button', { name: '加入岗位池' }).click();
+  const openAiId = await addJob(page, 'OpenAI', 'Product Intern');
+  const anthropicId = await addJob(page, 'Anthropic', 'Research Intern');
 
   const card = page.locator('.job-card').filter({ hasText: 'OpenAI' }).filter({ hasText: 'Product Intern' });
   await expect(card).toBeVisible();
@@ -38,11 +47,21 @@ test('keeps created jobs and stage changes after reload', async ({ page }) => {
   await expect(page.locator('.kanban-col[data-stage="关注"] .job-card', { hasText: 'OpenAI' })).toBeVisible();
 
   await expect(card).toHaveCount(1);
-  const jobId = await card.getAttribute('data-id');
-  await dragJobToStage(page, jobId, '已投递');
+  await dragJobToStage(page, openAiId, '已投递');
+  await dragJobToStage(page, anthropicId, '已投递');
+  await dragJobToStage(page, anthropicId, '已投递');
   await expect(page.locator('.kanban-col[data-stage="已投递"] .job-card', { hasText: 'OpenAI' })).toBeVisible();
+
+  await page.getByRole('tab', { name: '表格' }).click();
+  await expect(page.locator('#job-view-table')).toHaveClass(/active/);
+  await page.getByRole('tab', { name: '看板' }).click();
+  await page.locator('#job-search').fill('no matching jobs');
+  await expect(page.locator('#kanban-empty')).toBeVisible();
+  await page.locator('#job-search').fill('');
 
   await page.reload();
   await page.locator('.nav-item[data-section="jobs"]').click();
   await expect(page.locator('.kanban-col[data-stage="已投递"] .job-card', { hasText: 'OpenAI' })).toBeVisible();
+  const orderedIds = await page.locator('.kanban-col[data-stage="已投递"] .job-card').evaluateAll((cards) => cards.map((card) => card.dataset.id));
+  expect(orderedIds.indexOf(anthropicId)).toBeLessThan(orderedIds.indexOf(openAiId));
 });

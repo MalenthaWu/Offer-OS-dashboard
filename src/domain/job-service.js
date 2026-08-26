@@ -67,6 +67,10 @@ export function createJobService({ db, store, clock = () => new Date(), idFactor
   }
 
   async function update(id, patch) {
+    if (Object.hasOwn(patch, 'stage')) {
+      throw new Error('Use changeStage to update a job stage');
+    }
+
     const updatedAt = toISO(clock);
     let job;
 

@@ -12,14 +12,16 @@ async function completeDemoLogin(page) {
   await expect(page.locator('#login-gate')).toBeHidden();
 }
 
-async function dragJobToStage(page, jobId, stage) {
+async function dragJobToStage(page, jobId, stage, beforeId = null) {
   const source = page.locator(`.job-card[data-id="${jobId}"]`);
-  const target = page.locator(`.kanban-col[data-stage="${stage}"]`);
-  const dataTransfer = await page.evaluateHandle(() => new DataTransfer());
-  await source.dispatchEvent('dragstart', { dataTransfer });
-  await target.dispatchEvent('dragover', { dataTransfer });
-  await target.dispatchEvent('drop', { dataTransfer });
-  await source.dispatchEvent('dragend', { dataTransfer });
+  const column = page.locator(`.kanban-col[data-stage="${stage}"]`);
+  const target = beforeId ? page.locator(`.job-card[data-id="${beforeId}"]`) : column;
+  const options = { dataTransfer: await page.evaluateHandle(() => new DataTransfer()) };
+  if (beforeId) options.clientY = (await target.boundingBox()).y + 1;
+  await source.dispatchEvent('dragstart', options);
+  await target.dispatchEvent('dragover', options);
+  await target.dispatchEvent('drop', options);
+  await source.dispatchEvent('dragend', options);
 }
 
 async function addJob(page, company, position) {
@@ -49,7 +51,7 @@ test('keeps created jobs and stage changes after reload', async ({ page }) => {
   await expect(card).toHaveCount(1);
   await dragJobToStage(page, openAiId, '已投递');
   await dragJobToStage(page, anthropicId, '已投递');
-  await dragJobToStage(page, anthropicId, '已投递');
+  await dragJobToStage(page, openAiId, '已投递', anthropicId);
   await expect(page.locator('.kanban-col[data-stage="已投递"] .job-card', { hasText: 'OpenAI' })).toBeVisible();
 
   await page.getByRole('tab', { name: '表格' }).click();
@@ -63,5 +65,5 @@ test('keeps created jobs and stage changes after reload', async ({ page }) => {
   await page.locator('.nav-item[data-section="jobs"]').click();
   await expect(page.locator('.kanban-col[data-stage="已投递"] .job-card', { hasText: 'OpenAI' })).toBeVisible();
   const orderedIds = await page.locator('.kanban-col[data-stage="已投递"] .job-card').evaluateAll((cards) => cards.map((card) => card.dataset.id));
-  expect(orderedIds.indexOf(anthropicId)).toBeLessThan(orderedIds.indexOf(openAiId));
+  expect(orderedIds.indexOf(openAiId)).toBeLessThan(orderedIds.indexOf(anthropicId));
 });

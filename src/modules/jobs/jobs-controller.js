@@ -46,7 +46,7 @@ function beforeJobId(column, jobId, clientY) {
   return nextCard?.dataset.id ?? null;
 }
 
-export function initJobsController({ root, store, service, showToast }) {
+export function initJobsController({ root, store, service, showToast, onFilter = () => {} }) {
   root.__OFFER_OS_JOBS_CLEANUP__?.();
   const board = root.querySelector('#kanban-board');
   const form = root.querySelector('#add-job-form');
@@ -56,8 +56,10 @@ export function initJobsController({ root, store, service, showToast }) {
 
   const render = () => {
     renderJobs(root, store.getState().jobs);
-    applyFilters(root);
+    applyFilters(root); onFilter();
   };
+  const onSearchInput = () => { applyFilters(root); onFilter(); };
+  const onBatchChange = () => { applyFilters(root); onFilter(); };
   const onFailure = (error) => showToast(failureMessage(error));
 
   const removeJob = async (id, name) => {
@@ -144,8 +146,8 @@ export function initJobsController({ root, store, service, showToast }) {
   board?.addEventListener('dragend', onDragEnd);
   board?.addEventListener('dragover', onDragOver);
   board?.addEventListener('drop', onDrop);
-  search?.addEventListener('input', () => applyFilters(root));
-  batchFilter?.addEventListener('change', () => applyFilters(root));
+  search?.addEventListener('input', onSearchInput);
+  batchFilter?.addEventListener('change', onBatchChange);
   if (root.defaultView) {
     root.defaultView.__OFFER_OS_REMOVE_JOB__ = (id, name) => removeJob(id, name);
   }
@@ -159,8 +161,11 @@ export function initJobsController({ root, store, service, showToast }) {
     board?.removeEventListener('dragend', onDragEnd);
     board?.removeEventListener('dragover', onDragOver);
     board?.removeEventListener('drop', onDrop);
+    search?.removeEventListener('input', onSearchInput);
+    batchFilter?.removeEventListener('change', onBatchChange);
     unsubscribe();
     if (root.defaultView?.__OFFER_OS_REMOVE_JOB__) delete root.defaultView.__OFFER_OS_REMOVE_JOB__;
+    if (root.__OFFER_OS_JOBS_CLEANUP__ === cleanup) delete root.__OFFER_OS_JOBS_CLEANUP__;
   };
   root.__OFFER_OS_JOBS_CLEANUP__ = cleanup;
   return cleanup;

@@ -13,6 +13,12 @@ function createRoot() {
 
 afterEach(() => document.body.replaceChildren());
 
+function dispatchDrag(target, type, dataTransfer, clientY) {
+  const event = new Event(type, { bubbles: true, cancelable: true });
+  Object.defineProperties(event, { dataTransfer: { value: dataTransfer }, clientY: { value: clientY } });
+  target.dispatchEvent(event);
+}
+
 describe('initJobsController', () => {
   it('creates through the service and renders the changed store state', async () => {
     const root = createRoot();
@@ -38,11 +44,39 @@ describe('initJobsController', () => {
     const store = createAppStore();
     const service = { create: vi.fn(), move: vi.fn(), remove: vi.fn() };
 
-    initJobsController({ root, store, service, showToast: vi.fn() });
-    initJobsController({ root, store, service, showToast: vi.fn() });
+    const onFilter = vi.fn();
+    initJobsController({ root, store, service, showToast: vi.fn(), onFilter });
+    initJobsController({ root, store, service, showToast: vi.fn(), onFilter });
+    onFilter.mockClear();
     root.querySelector('#add-job-form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    root.querySelector('#job-search').dispatchEvent(new Event('input', { bubbles: true }));
+    root.querySelector('#batch-filter').dispatchEvent(new Event('change', { bubbles: true }));
 
     await vi.waitFor(() => expect(service.create).toHaveBeenCalledOnce());
+    expect(onFilter).toHaveBeenCalledTimes(2);
+  });
+
+  it('moves a same-column drag before the card at the drop position', async () => {
+    const root = createRoot();
+    const jobs = [
+      { id: 'job-a', company: 'A', position: 'PM', batch: '日常实习', stage: '关注', order: 0 },
+      { id: 'job-b', company: 'B', position: 'PM', batch: '日常实习', stage: '关注', order: 1 },
+      { id: 'job-c', company: 'C', position: 'PM', batch: '日常实习', stage: '关注', order: 2 },
+    ];
+    const store = createAppStore({ jobs });
+    const service = { create: vi.fn(), move: vi.fn().mockResolvedValue(undefined), remove: vi.fn() };
+    initJobsController({ root, store, service, showToast: vi.fn() });
+    const board = root.querySelector('#kanban-board');
+    const source = board.querySelector('[data-id="job-a"]');
+    const before = board.querySelector('[data-id="job-b"]');
+    before.getBoundingClientRect = () => ({ top: 100, height: 20 });
+    board.querySelector('[data-id="job-c"]').getBoundingClientRect = () => ({ top: 200, height: 20 });
+    const dataTransfer = { setData: vi.fn(), getData: vi.fn(() => 'job-a') };
+
+    dispatchDrag(source, 'dragstart', dataTransfer, 0);
+    dispatchDrag(board.querySelector('.kanban-col[data-stage="关注"]'), 'drop', dataTransfer, 105);
+
+    await vi.waitFor(() => expect(service.move).toHaveBeenCalledWith('job-a', '关注', 'job-b'));
   });
 
   it('delegates detail and delete actions to persistent handlers', async () => {

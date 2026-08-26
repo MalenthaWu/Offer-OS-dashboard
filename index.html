@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <meta name="description" content="Offer OS — 个人求职进度、日程、简历与模拟面试工作台" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231c1c1b'/%3E%3Ccircle cx='16' cy='13' r='7' fill='none' stroke='white' stroke-width='2'/%3E%3Cpath d='M12 22c1.5-4 6.5-4 8 0' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <title>Offer OS · 求职工作台</title>
+  
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute;visibility:hidden" aria-hidden="true">
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/></symbol>
+    <symbol id="i-briefcase" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v5h5M9 12h6M9 16h6"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="12" rx="4"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6 7v5l-4 2v-7z"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9z"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="8" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="3" y="15" width="7" height="6" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/></symbol>
+    <symbol id="i-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v12H4zM3 4h18v4H3zM9 12h6"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.3 4.1L17 9l-3.7 1.9L12 15l-1.3-4.1L7 9l3.7-1.9zM19 15l.7 2.3L22 18l-2.3.7L19 21l-.7-2.3L16 18l2.3-.7zM5 3l.6 1.6L7 5l-1.4.4L5 7l-.6-1.6L3 5l1.4-.4z"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+    <symbol id="i-magic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"/><path d="m5 19 9-9"/></symbol>
+    <symbol id="i-bot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="13" rx="3"/><path d="M12 3v4M8 12h.01M16 12h.01M8 16h8"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M18 12a6 6 0 0 0-10.5-4M6 12a6 6 0 0 0 10.5 4"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 3h6l1 4H8zM6 7l1 14h10l1-14M10 11v6M14 11v6"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 3.4 2.3c-.8.4-1 1-1 1.7M12 17h.01"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17 9 12l4 3 7-8M15 7h5v5"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8l1.8-1.8M18 6l1.8-1.8"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8Z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-3.5 3-6 7-6s7 2.5 7 6"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 12h10M17 9l-3 3 3 3"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2 15 22l-4-9-9-4z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+  </svg>
+
+  <div id="login-gate" class="login-gate" hidden>
+    <div class="login-gate-card">
+      <div class="login-gate-brand">
+        <span class="login-gate-mark">OS</span>
+        <div><strong>Offer OS</strong><span>求职工作台</span></div>
+      </div>
+      <h1>登录，开始求职之旅</h1>
+      <p class="login-intro">支持邮箱或手机两种方式登录。验证码为<strong>演示模式</strong>自动生成，无需真实收发邮件 / 短信。</p>
+      <div class="segmented login-tabs" role="tablist" aria-label="登录方式" id="login-tabs">
+        <button class="segment active" type="button" data-login-method="email" role="tab"><svg class="icon icon-sm"><use href="#i-mail"/></svg>邮箱验证码</button>
+        <button class="segment" type="button" data-login-method="phone" role="tab"><svg class="icon icon-sm"><use href="#i-phone"/></svg>手机短信</button>
+      </div>
+
+      <div class="login-pane" id="login-email-pane">
+        <div class="login-field">
+          <label for="login-email">邮箱</label>
+          <input class="text-input" id="login-email" type="email" placeholder="you@example.com" autocomplete="off" />
+        </div>
+        <div class="login-field">
+          <label for="login-code-email">验证码</label>
+          <div class="login-input-row">
+            <input class="text-input" id="login-code-email" type="text" inputmode="numeric" maxlength="6" placeholder="6 位验证码" autocomplete="off" />
+            <button class="login-send-btn" type="button" id="login-send-email">获取验证码</button>
+          </div>
+          <p class="login-demo" id="login-demo-email" hidden></p>
+        </div>
+      </div>
+
+      <div class="login-pane" id="login-phone-pane" hidden>
+        <div class="login-field">
+          <label for="login-phone">手机号</label>
+          <input class="text-input" id="login-phone" type="tel" inputmode="numeric" maxlength="11" placeholder="13800138000" autocomplete="off" />
+        </div>
+        <div class="login-field">
+          <label for="login-code-phone">验证码</label>
+          <div class="login-input-row">
+            <input class="text-input" id="login-code-phone" type="text" inputmode="numeric" maxlength="6" placeholder="6 位验证码" autocomplete="off" />
+            <button class="login-send-btn" type="button" id="login-send-sms">获取短信验证码</button>
+          </div>
+          <p class="login-demo" id="login-demo-phone" hidden></p>
+        </div>
+      </div>
+
+      <button class="primary-button login-submit" type="button" id="login-submit">登录</button>
+      <p class="login-foot">登录即表示同意《用户协议》与《隐私政策》（原型占位）</p>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="主导航">
+      <div class="brand-row">
+        <div class="brand-copy"><strong>Offer OS</strong><span>求职工作台</span></div>
+      </div>
+
+      <div class="nav-label">工作空间</div>
+      <nav class="nav-list">
+        <button class="nav-item active" data-section="dashboard" type="button"><svg class="icon"><use href="#i-home"/></svg>仪表盘</button>
+        <button class="nav-item" data-section="jobs" type="button"><svg class="icon"><use href="#i-briefcase"/></svg>岗位<span class="nav-count">12</span></button>
+        <button class="nav-item" data-section="resume" type="button"><svg class="icon"><use href="#i-file"/></svg>简历<span class="nav-count">3</span></button>
+        <button class="nav-item" data-section="interview" type="button"><svg class="icon"><use href="#i-mic"/></svg>面试</button>
+        <button class="nav-item" data-section="review" type="button"><svg class="icon"><use href="#i-edit"/></svg>复盘</button>
+      </nav>
+
+      <div class="nav-divider"></div>
+      <div class="nav-label">工具</div>
+      <div class="nav-list">
+        <button class="nav-item tool-nav" data-tool="feishu" type="button"><svg class="icon"><use href="#i-refresh"/></svg>飞书同步<span class="nav-count" style="color:#3f7652">ON</span></button>
+        <button class="nav-item tool-nav" data-tool="scout" type="button"><svg class="icon"><use href="#i-search"/></svg>岗位搜索器</button>
+        <button class="nav-item tool-nav" data-tool="apply" type="button"><svg class="icon"><use href="#i-zap"/></svg>网申助手</button>
+        <button class="nav-item tool-nav" data-tool="resume-autofill" type="button"><svg class="icon"><use href="#i-magic"/></svg>简历自动填写</button>
+      </div>
+
+      <div class="assistant-entry">
+        <button id="open-assistant" type="button">
+          <div class="assistant-top"><span class="assistant-icon"><svg class="icon icon-sm"><use href="#i-spark"/></svg></span><strong>Career Copilot</strong><svg class="icon icon-sm" style="margin-left:auto"><use href="#i-chevron"/></svg></div>
+          <p>帮你拆 JD、改简历，也会提醒关键节点。</p>
+        </button>
+      </div>
+
+      <div class="sidebar-spacer"></div>
+        <div class="profile">
+          <div class="avatar" id="profile-avatar">XR</div>
+          <div class="profile-copy"><strong id="profile-name">欣睿</strong><span id="profile-sub">AI 产品 · 增长实习</span></div>
+          <button class="icon-button" type="button" id="profile-settings" aria-label="设置" title="设置" style="width:27px;height:27px;border:0;background:transparent"><svg class="icon icon-sm"><use href="#i-settings"/></svg></button>
+        </div>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-button mobile-menu" id="mobile-menu" type="button" aria-label="打开导航"><svg class="icon"><use href="#i-grid"/></svg></button>
+        <button class="topbar-search" id="global-search" type="button" aria-label="搜索岗位">
+          <svg class="icon icon-sm"><use href="#i-search"/></svg><span>搜索工作台</span><kbd>⌘ K</kbd>
+        </button>
+        <div class="topbar-spacer"></div>
+        <div class="sync-state"><span class="sync-dot"></span>飞书已同步 · 2 分钟前</div>
+        <button class="primary-button" type="button" id="top-add-job"><svg class="icon icon-sm"><use href="#i-plus"/></svg>添加岗位</button>
+      </header>
+
+      <div class="content">
+        <section class="page active" id="page-dashboard" aria-labelledby="dashboard-title">
+          <div class="page-heading">
+            <div><p class="eyebrow">WED · AUG 26 · 2026</p><h1 id="dashboard-title">早上好，欣睿</h1><p>接下来最重要的不是投更多，而是把正在发生的机会推进好。</p></div>
+            <div class="heading-actions"><button class="secondary-button" type="button" data-section-jump="interview"><svg class="icon icon-sm"><use href="#i-mic"/></svg>练一场面试</button><button class="primary-button" type="button" data-section-jump="jobs"><svg class="icon icon-sm"><use href="#i-briefcase"/></svg>查看岗位</button></div>
+          </div>
+
+          <div class="dash-stat-grid">
+            <article class="panel dash-stat"><span class="metric-icon" style="--tone:var(--blue);--tone-ink:var(--blue-ink)"><svg class="icon icon-sm"><use href="#i-briefcase"/></svg></span><div class="dash-stat-copy"><strong>230</strong><em>全部岗位</em><p>岗位总数</p></div></article>
+            <article class="panel dash-stat"><span class="metric-icon" style="--tone:var(--butter);--tone-ink:var(--butter-ink)"><svg class="icon icon-sm"><use href="#i-clock"/></svg></span><div class="dash-stat-copy"><strong>217</strong><em>高优先 93 个</em><p>待投递</p></div></article>
+            <article class="panel dash-stat"><span class="metric-icon" style="--tone:var(--lilac);--tone-ink:var(--lilac-ink)"><svg class="icon icon-sm"><use href="#i-check"/></svg></span><div class="dash-stat-copy"><strong>11</strong><em>流程中</em><p>已投递</p></div></article>
+            <article class="panel dash-stat"><span class="metric-icon" style="--tone:var(--mint);--tone-ink:var(--mint-ink)"><svg class="icon icon-sm"><use href="#i-archive"/></svg></span><div class="dash-stat-copy"><strong>1</strong><em>Offer / 已挂</em><p>已结束</p></div></article>
+          </div>
+
+          <div class="month-layout">
+            <article class="panel month-calendar">
+              <div class="month-calendar-head">
+                <div class="month-heading"><strong id="month-title">2026 年 8 月</strong><span id="month-summary">4 场面试 · 3 个截止 · 8 项任务</span></div>
+                <div class="month-nav"><button class="icon-button" id="month-prev" type="button" aria-label="上一个月"><svg class="icon icon-sm" style="transform:rotate(180deg)"><use href="#i-chevron"/></svg></button><button class="secondary-button month-today" id="month-today" type="button">今天</button><button class="icon-button" id="month-next" type="button" aria-label="下一个月"><svg class="icon icon-sm"><use href="#i-chevron"/></svg></button></div>
+                <div class="calendar-legend" aria-label="日程类型筛选"><button class="calendar-filter active" data-calendar-filter="all" type="button">全部</button><button class="calendar-filter" data-calendar-filter="interview" type="button"><span class="legend-dot" style="background:#86aac8"></span>面试</button><button class="calendar-filter" data-calendar-filter="deadline" type="button"><span class="legend-dot" style="background:#c89197"></span>截止</button><button class="calendar-filter" data-calendar-filter="task" type="button"><span class="legend-dot" style="background:#c2a35e"></span>任务</button></div>
+              </div>
+              <div class="month-scroll"><div class="month-canvas"><div class="month-weekdays"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div><div class="month-days" id="month-days" aria-live="polite"></div></div></div>
+            </article>
+
+            <aside class="month-side">
+              <div class="heat-card" id="heatmap-card">
+                <div class="heat-head">
+                  <div class="heat-title">
+                    <h3>投递热力图</h3>
+                    <span class="heat-badge">新增</span>
+                    <span class="heat-sub">近 3 个月</span>
+                  </div>
+                  <div class="heat-legend">
+                    <span>少</span>
+                    <span class="sw" style="background:#EAF1F9;border:1px solid var(--line)"></span>
+                    <span class="sw" style="background:#C7DCF2"></span>
+                    <span class="sw" style="background:#8FBCE8"></span>
+                    <span class="sw" style="background:#4C8FD4"></span>
+                    <span class="sw" style="background:#1F5FA8"></span>
+                    <span>多</span>
+                  </div>
+                </div>
+                <div class="heat-body">
+                  <div class="heat-weekdays" id="heat-weekdays"></div>
+                  <div class="heat-grid-wrap">
+                    <div class="heat-months" id="heat-months"></div>
+                    <div class="heat-grid" id="heat-grid"></div>
+                    <div class="heat-tip" id="heat-tip"></div>
+                  </div>
+                </div>
+              </div>
+              <article class="next-moment-compact">
+                <div class="next-compact-label"><svg class="icon icon-sm"><use href="#i-zap"/></svg>Next decisive moment</div>
+                <div class="next-compact-time"><strong>38h</strong><span>距离下一场面试</span></div>
+                <h2>字节跳动 · AI 产品经理一面</h2><p>8 月 28 日 14:30 · 飞书会议</p>
+                <div class="next-actions"><button class="light-action" type="button" data-toast="字节面试准备清单已打开">查看准备清单</button><button class="dark-action" type="button" data-section-jump="interview">模拟一轮</button></div>
+              </article>
+              <article class="panel month-agenda">
+                <div class="panel-header"><svg class="icon icon-sm"><use href="#i-calendar"/></svg><h2>接下来</h2><span class="badge badge-blush">5 项</span><button class="text-link header-end" type="button" id="add-event">添加<svg class="icon icon-sm"><use href="#i-plus"/></svg></button></div>
+                <div class="agenda-list">
+                  <div class="agenda-date">今天 · 8 月 26 日</div>
+                  <div class="agenda-item" style="--dot:#c2a35e" data-toast="腾讯笔试详情已打开"><strong>腾讯 · 产品策划笔试</strong><p>19:00 · 在线测评 · 90 分钟</p><span class="count-tag">7h</span></div>
+                  <div class="agenda-date">周五 · 8 月 28 日</div>
+                  <div class="agenda-item" style="--dot:#86aac8" data-toast="字节一面详情已打开"><strong>字节跳动 · AI 产品一面</strong><p>14:30 · 飞书会议</p><span class="count-tag">2d</span></div>
+                  <div class="agenda-item" style="--dot:#c89197" data-toast="小红书截止详情已打开"><strong>小红书 · 网申截止</strong><p>增长产品实习生</p><span class="count-tag">2d</span></div>
+                  <div class="agenda-date">下周 · 9 月 1 日</div>
+                  <div class="agenda-item" style="--dot:#79a087" data-toast="美团 HR 面详情已打开"><strong>美团 · HR 面</strong><p>10:30 · 腾讯会议</p><span class="count-tag">6d</span></div>
+                  <div class="agenda-item" style="--dot:#9d8db4" data-toast="周复盘已打开"><strong>复盘本周投递</strong><p>自定义 · 30 分钟</p><span class="count-tag">7d</span></div>
+                </div>
+              </article>
+            </aside>
+          </div>
+        </section>
+
+        <section class="page" id="page-jobs" aria-labelledby="jobs-title">
+          <div class="page-heading"><div><p class="eyebrow">JOB PIPELINE · 12 ACTIVE</p><h1 id="jobs-title">岗位看板</h1><p>让每一个机会都有下一步，不让信息停在收藏夹里。</p></div><div class="heading-actions"><button class="sync-blue" type="button" id="sync-jobs"><svg class="icon icon-sm"><use href="#i-refresh"/></svg>同步飞书</button><button class="primary-button add-job-trigger" type="button"><svg class="icon icon-sm"><use href="#i-plus"/></svg>添加岗位</button></div></div>
+          <div class="subnav-toolbar">
+            <div class="segmented" role="tablist" aria-label="岗位视图">
+              <button class="segment active" type="button" data-job-view="kanban" role="tab"><svg class="icon icon-sm"><use href="#i-grid"/></svg>看板</button>
+              <button class="segment" type="button" data-job-view="table" role="tab"><svg class="icon icon-sm"><use href="#i-table"/></svg>表格</button>
+              <button class="segment" type="button" data-job-view="internships" role="tab"><svg class="icon icon-sm"><use href="#i-archive"/></svg>实习信息搜集</button>
+              <button class="segment" type="button" data-job-view="portals" role="tab"><svg class="icon icon-sm"><use href="#i-globe"/></svg>官网入口</button>
+            </div>
+            <div class="toolbar-spacer"></div>
+            <div class="field-wrap"><svg class="icon icon-sm"><use href="#i-search"/></svg><input class="search-input" id="job-search" type="search" placeholder="搜索公司或岗位…" aria-label="搜索公司或岗位" /></div>
+            <select class="select-input" id="batch-filter" aria-label="按招聘批次筛选"><option value="all">全部批次</option><option value="日常实习">日常实习</option><option value="暑期实习">暑期实习</option><option value="秋招">秋招</option></select>
+            <button class="icon-button" type="button" aria-label="更多筛选" id="more-filter"><svg class="icon icon-sm"><use href="#i-filter"/></svg></button>
+          </div>
+
+          <div class="job-view active" id="job-view-kanban">
+            <div class="kanban" id="kanban-board">
+              <div class="kanban-col" data-stage="关注"><div class="col-head"><span class="status-dot" style="--dot:#9a9a96"></span><strong>关注</strong><span class="col-count">3</span><button class="icon-button add-job-trigger" type="button" aria-label="添加关注岗位"><svg class="icon icon-sm"><use href="#i-plus"/></svg></button></div>
+                <article class="job-card" data-job-search data-company="Notion" data-position="Product Intern" data-priority="P1" data-batch="日常实习" data-favorite="true"><div class="job-top"><span class="company-logo" style="--logo-bg:#eee;--logo-ink:#222">N</span><div class="job-title"><strong>Product Intern</strong><span>Notion · 上海 / 远程</span></div><button class="star-button favorite" type="button" aria-label="取消收藏"><svg class="icon icon-sm"><use href="#i-star"/></svg></button></div><div class="job-tags"><span class="badge badge-gray">日常实习</span><span class="badge badge-lilac">AI Productivity</span></div><div class="job-meta"><span><svg class="icon icon-sm"><use href="#i-clock"/></svg>今天更新</span><span class="job-menu">•••</span></div><div class="job-actions"><button class="mini-action" type="button" data-toast="已打开 JD 摘要">查看 JD</button><button class="mini-action" type="button" data-mock-job="Notion Product Intern">模拟面试</button></div></article>
+                <article class="job-card" data-job-search data-company="小红书" data-position="增长产品实习生" data-priority="P0" data-batch="日常实习" data-favorite="true"><div class="job-top"><span class="company-logo" style="--logo-bg:#f8e6e5;--logo-ink:#9b4e48">RED</span><div class="job-title"><strong>增长产品实习生</strong><span>小红书 · 上海</span></div><button class="star-button favorite" type="button" aria-label="取消收藏"><svg class="icon icon-sm"><use href="#i-star"/></svg></button></div><div class="job-tags"><span class="badge badge-gray">日常实习</span><span class="badge badge-blush">8.28 截止</span></div><div class="job-meta"><span><svg class="icon icon-sm"><use href="#i-clock"/></svg>2 天前</span><span class="job-menu">•••</span></div><div class="job-actions"><button class="mini-action" type="button" data-toast="已打开 JD 摘要">查看 JD</button><button class="mini-action" type="button" data-mock-job="小红书 增长产品实习生">模拟面试</button></div></article>
+                <article class="job-card" data-job-search data-company="蚂蚁集团" data-position="AI 产品经理实习生" data-priority="P1" data-batch="秋招" data-favorite="false"><div class="job-top"><span class="company-logo" style="--logo-bg:#e4eef8;--logo-ink:#3773a2">蚁</span><div class="job-title"><strong>AI 产品经理实习生</strong><span>蚂蚁集团 · 杭州</span></div><button class="star-button" type="button" aria-label="收藏"><svg class="icon icon-sm"><use href="#i-star"/></svg></button></div><div class="job-tags"><span class="badge badge-blue">秋招提前批</span></div><div class="job-meta"><span><svg class="icon icon-sm"><use href="#i-clock"/></svg>3 天前</span><span class="job-menu">•••</span></div><div class="job-actions"><button class="mini-action" type="button" data-toast="已打开 JD 摘要">查看 JD</button><button class="mini-action" type="button" data-mock-job="蚂蚁集团 AI 产品经理实习生">模拟面试</button></div></article>
+                <button class="add-card add-job-trigger" type="button"><svg class="icon icon-sm"><use href="#i-plus"/></svg>添加到关注</button>
+              </div>
+              <div class="kanban-col" data-stage="已投递"><div class="col-head"><span class="status-dot" style="--dot:#7da1bd"></span><strong>已投递</strong><span class="col-count">3</span><button class="icon-button add-job-trigger" type="button" aria-label="添加岗位"><svg class="icon icon-sm"><use href="#i-plus"/></svg></button></div>
+                <article class="job-card" data-job-search data-company="美团" data-position="到店增长产品实习生" data-priority="P0" data-batch="日常实习" data-favorite="false"><div class="job-top"><span class="company-logo" style="--logo-bg:#f8edc9;--logo-ink:#796324">MT</span><div class="job-title"><strong>到店增长产品实习生</strong><span>美团 · 北京</span></div><button class="star-button" type="button"><svg class="icon icon-sm"><use href="#i-star"/></svg></button></div><div class="job-tags"><span class="badge badge-blue">已投递</span><span class="badge badge-gray">官网</span></div><div class="job-meta"><span><svg class="icon icon-sm"><use href="#i-calendar"/></svg>8 月 25 日</span><span class="job-menu">•••</span></div><div class="job-actions"><button class="mini-action" type="button" data-toast="已记录一次跟进">记录跟进</button><button class="mini-action" type="button" data-mock-job="美团 到店增长产品实习生">模拟面试</button></div></article>
+                <article class="job-card" data-job-search data-company="得物" data-position="社区产品实习生" data-priority="P2" data-batch="日常实习" data-favorite="true"><div class="job-top"><span class="company-logo" style="--logo-bg:#e5f3ee;--logo-ink:#3d7961">DW</span><div class="job-title"><strong>社区产品实习生</strong><span>得物 App · 上海</span></div><button class="star-button favorite" type="button"><svg class="icon icon-sm"><use href="#i-star"/></svg></button></div><div class="job-tags"><span class="badge badge-blue">已投递</span></div><div class="job-meta"><span><svg class="icon icon-sm"><use href="#i-calendar"/></svg>8 月 23 日</span><span class="job-menu">•••</span></div><div class="job-actions"><button class="mini-action" type="button" data-toast="已记录一次跟进">记录跟进</button><button class="mini-action" type="button" data-mock-job="得物 社区产品实习生">模拟面试</button></div></article>
+                <article class="job-card" data-job-search data-company="快手" data-position="商业化产品实习生" data-priority="P1" data-batch="暑期实习" data-favorite="false"><div class="job-top"><span class="company-logo" style="--logo-bg:#f6e9df;--logo-ink:#9a5c36">KS</span><div class="job-title"><strong>商业化产品实习生</strong><span>快手 · 北京</span></div><button class="star-button" type="button"><svg class="icon icon-sm"><use href="#i-star"/></svg></button></div><div class="job-tags"><span class="badge badge-blue">已投递</span><span class="badge badge-gray">暑期</span></div><div class="job-meta"><span><svg class="icon icon-sm"><use href="#i-calendar"/></svg>8 月 21 日</span><span class="job-menu">•••</span></div><div class="job-actions"><button class="mini-action" type="button" data-toast="已记录一次跟进">记录跟进</button><button class="mini-action" type="button" data-mock-job="快手 商业化产品实习生">模拟面试</button></div></article>
+                <button class="add-card add-job-trigger" type="button"><svg class="icon icon-sm"><use href="#i-plus"/></svg>添加岗位</button>
+              </div>
+              <div class="kanban-col" data-stage="已测评"><div class="col-head"><span class="status-dot" style="--dot:#c99e55"></span><strong>已测评 / 笔试</strong><span class="col-count">2</span><button class="icon-button add-job-trigger" type="button" aria-label="添加岗位"><svg class="icon icon-sm"><use href="#i-plus"/></svg></button></div>
+                <article class="job-card" data-job-search data-company="腾讯" data-position="产品策划实习生" data-priority="P0" data-batch="秋招" data-favorite="true"><div class="job-top"><span class="company-logo" style="--logo-bg:#e3edf6;--logo-ink:#3d6c95">T</span><div class="job-title"><strong>产品策划实习生</strong><span>腾讯 · 深圳</span></div><button class="star-button favorite" type="button"><svg class="icon icon-sm"><use href="#i-star"/></svg></button></div><div class="job-tags"><span class="badge badge-butter">今晚笔试</span><span class="badge badge-gray">秋招</span></div><div class="job-meta"><span><svg class="icon icon-sm"><use href="#i-clock"/></svg>19:00</span><span class="job-menu">•••</span></div><div class="job-actions"><button class="mini-action" type="button" data-toast="准备清单已打开">准备清单</button><button class="mini-action" type="button" data-mock-job="腾讯 产品策划实习生">模拟面试</button></div></article>
+                <article class="job-card" data-job-search data-company="京东" data-position="用户增长产品实习生" data-priority="P1" data-batch="秋招" data-favorite="false"><div class="job-top"><span class="company-logo" style="--logo-bg:#f8e5e3;--logo-ink:#a0453d">JD</span><div class="job-title"><strong>用户增长产品实习生</strong><span>京东 · 北京</span></div><button class="star-button" type="button"><svg class="icon icon-sm"><use href="#i-star"/></svg></button></div><div class="job-tags"><span class="badge badge-butter">测评完成</span></div><div class="job-meta"><span><svg class="icon icon-sm"><use href="#i-calendar"/></svg>8 月 24 日</span><span class="job-menu">•••</span></div><div class="job-actions"><button class="mini-action" type="button" data-toast="测评复盘已打开">测评复盘</button><button class="mini-action" type="button" data-mock-job="京东 用户增长产品实习生">模拟面试</button></div></article>
+                <button class="add-card add-job-trigger" type="button"><svg class="icon icon-sm"><use href="#i-plus"/></svg>添加岗位</button>
+              </div>
+              <div class="kanban-col" data-stage="面试中"><div class="col-head"><span class="status-dot" style="--dot:#a186bd"></span><strong>面试中</strong><span class="col-count">2</span><button class="icon-button add-job-trigger" type="button" aria-label="添加岗位"><svg class="icon icon-sm"><use href="#i-plus"/></svg></button></div>
+                <article class="job-card" data-job-search data-company="字节跳动" data-position="AI 产品经理实习生" data-priority="P0" data-batch="日常实习" data-favorite="true"><div class="job-top"><span class="company-logo" style="--logo-bg:#e7e8f4;--logo-ink:#4a5687">BY</span><div class="job-title"><strong>AI 产品经理实习生</strong><span>字节跳动 · 北京</span></div><button class="star-button favorite" type="button"><svg class="icon icon-sm"><use href="#i-star"/></svg></button></div><div class="job-tags"><span class="badge badge-lilac">一面 · 8.28</span><span class="badge badge-mint">匹配 86%</span></div><div class="job-meta"><span><svg class="icon icon-sm"><use href="#i-clock"/></svg>还有 38 小时</span><span class="job-menu">•••</span></div><div class="job-actions"><button class="mini-action" type="button" data-toast="面试准备页已打开">面试准备</button><button class="mini-action" type="button" data-mock-job="字节跳动 AI 产品经理实习生">模拟面试</button></div></article>
+                <article class="job-card" data-job-search data-company="美团" data-position="策略产品经理" data-priority="P1" data-batch="秋招" data-favorite="true"><div class="job-top"><span class="company-logo" style="--logo-bg:#f8edc9;--logo-ink:#796324">MT</span><div class="job-title"><strong>策略产品经理</strong><span>美团 · 北京</span></div><button class="star-button favorite" type="button"><svg class="icon icon-sm"><use href="#i-star"/></svg></button></div><div class="job-tags"><span class="badge badge-lilac">HR 面 · 9.1</span></div><div class="job-meta"><span><svg class="icon icon-sm"><use href="#i-clock"/></svg>还有 6 天</span><span class="job-menu">•••</span></div><div class="job-actions"><button class="mini-action" type="button" data-toast="面试准备页已打开">面试准备</button><button class="mini-action" type="button" data-mock-job="美团 策略产品经理">模拟面试</button></div></article>
+                <button class="add-card add-job-trigger" type="button"><svg class="icon icon-sm"><use href="#i-plus"/></svg>添加岗位</button>
+              </div>
+              <div class="kanban-col" data-stage="已结束"><div class="col-head"><span class="status-dot" style="--dot:#78a486"></span><strong>已结束</strong><span class="col-count">2</span><button class="icon-button add-job-trigger" type="button" aria-label="添加岗位"><svg class="icon icon-sm"><use href="#i-plus"/></svg></button></div>
+                <article class="job-card" data-job-search data-company="飞书" data-position="产品运营实习生" data-priority="P2" data-batch="日常实习" data-favorite="false"><div class="job-top"><span class="company-logo" style="--logo-bg:#e4eef8;--logo-ink:#3e6e92">FS</span><div class="job-title"><strong>产品运营实习生</strong><span>飞书 · 北京</span></div><button class="star-button" type="button"><svg class="icon icon-sm"><use href="#i-star"/></svg></button></div><div class="job-tags"><span class="badge badge-mint">Offer</span><span class="badge badge-gray">已归档</span></div><div class="job-meta"><span><svg class="icon icon-sm"><use href="#i-calendar"/></svg>8 月 18 日</span><span class="job-menu">•••</span></div><div class="job-actions"><button class="mini-action" type="button" data-toast="复盘已打开">查看复盘</button><button class="mini-action" type="button" data-toast="已复制岗位记录">复制记录</button></div></article>
+                <article class="job-card" data-job-search data-company="百度" data-position="商业产品实习生" data-priority="P2" data-batch="暑期实习" data-favorite="false"><div class="job-top"><span class="company-logo" style="--logo-bg:#e8e7f4;--logo-ink:#585186">BD</span><div class="job-title"><strong>商业产品实习生</strong><span>百度 · 北京</span></div><button class="star-button" type="button"><svg class="icon icon-sm"><use href="#i-star"/></svg></button></div><div class="job-tags"><span class="badge badge-blush">流程结束</span></div><div class="job-meta"><span><svg class="icon icon-sm"><use href="#i-calendar"/></svg>8 月 12 日</span><span class="job-menu">•••</span></div><div class="job-actions"><button class="mini-action" type="button" data-toast="复盘已打开">查看复盘</button><button class="mini-action" type="button" data-toast="已复制岗位记录">复制记录</button></div></article>
+                <button class="add-card add-job-trigger" type="button"><svg class="icon icon-sm"><use href="#i-plus"/></svg>添加岗位</button>
+              </div>
+            </div>
+            <div class="empty-filter" id="kanban-empty"><strong>没有匹配的岗位</strong>试试更换关键词或批次。</div>
+          </div>
+
+          <div class="job-view" id="job-view-table">
+            <div class="panel table-panel"><table class="data-table"><thead><tr><th>公司 / 岗位</th><th>阶段</th><th>子阶段</th><th>批次</th><th>Base 地</th><th>投递链接</th><th>JD</th><th>投递日期</th><th>来源</th><th>收藏</th><th>更新</th></tr></thead><tbody id="job-table-body">
+              <tr data-job-search data-company="字节跳动" data-position="AI 产品经理实习生" data-batch="日常实习" data-base="北京" data-apply-link="https://jobs.bytedance.com/campus/position" data-favorite="true"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#e7e8f4;--logo-ink:#4a5687">BY</span><div><strong>字节跳动</strong><span>AI 产品经理实习生</span></div></div></td><td><span class="badge badge-lilac">面试中</span></td><td>一面</td><td>日常实习</td><td>北京</td><td><a class="table-link" href="https://jobs.bytedance.com/campus/position" target="_blank" rel="noreferrer">投递链接</a></td><td><button class="link-button" type="button" data-view-jd-row>查看 JD</button></td><td class="mono">2026-08-20</td><td>官网</td><td>★</td><td class="mono">2 MIN</td></tr>
+              <tr data-job-search data-company="腾讯" data-position="产品策划实习生" data-batch="秋招" data-base="深圳" data-apply-link="https://careers.tencent.com/jobdesc" data-favorite="true"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#e3edf6;--logo-ink:#3d6c95">T</span><div><strong>腾讯</strong><span>产品策划实习生</span></div></div></td><td><span class="badge badge-butter">已测评</span></td><td>笔试</td><td>秋招</td><td>深圳</td><td><a class="table-link" href="https://careers.tencent.com/jobdesc" target="_blank" rel="noreferrer">投递链接</a></td><td><button class="link-button" type="button" data-view-jd-row>查看 JD</button></td><td class="mono">2026-08-22</td><td>官网</td><td>★</td><td class="mono">1 H</td></tr>
+              <tr data-job-search data-company="美团" data-position="到店增长产品实习生" data-batch="日常实习" data-base="北京" data-apply-link="https://zhaopin.meituan.com" data-favorite="false"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#f8edc9;--logo-ink:#796324">MT</span><div><strong>美团</strong><span>到店增长产品实习生</span></div></div></td><td><span class="badge badge-blue">已投递</span></td><td>—</td><td>日常实习</td><td>北京</td><td><a class="table-link" href="https://zhaopin.meituan.com" target="_blank" rel="noreferrer">投递链接</a></td><td><button class="link-button" type="button" data-view-jd-row>查看 JD</button></td><td class="mono">2026-08-25</td><td>实习公司库</td><td>☆</td><td class="mono">3 H</td></tr>
+              <tr data-job-search data-company="小红书" data-position="增长产品实习生" data-batch="日常实习" data-base="上海" data-apply-link="https://job.xiaohongshu.com" data-favorite="true"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#f8e6e5;--logo-ink:#9b4e48">RED</span><div><strong>小红书</strong><span>增长产品实习生</span></div></div></td><td><span class="badge badge-gray">关注</span></td><td>—</td><td>日常实习</td><td>上海</td><td><a class="table-link" href="https://job.xiaohongshu.com" target="_blank" rel="noreferrer">投递链接</a></td><td><button class="link-button" type="button" data-view-jd-row>查看 JD</button></td><td class="mono">—</td><td>岗位搜索器</td><td>★</td><td class="mono">1 D</td></tr>
+              <tr data-job-search data-company="Notion" data-position="Product Intern" data-batch="日常实习" data-base="上海 / 远程" data-apply-link="https://www.notion.so/jobs" data-favorite="true"><td><div class="company-cell"><span class="company-logo">N</span><div><strong>Notion</strong><span>Product Intern</span></div></div></td><td><span class="badge badge-gray">关注</span></td><td>—</td><td>日常实习</td><td>上海 / 远程</td><td><a class="table-link" href="https://www.notion.so/jobs" target="_blank" rel="noreferrer">投递链接</a></td><td><button class="link-button" type="button" data-view-jd-row>查看 JD</button></td><td class="mono">—</td><td>手动</td><td>★</td><td class="mono">TODAY</td></tr>
+              <tr data-job-search data-company="得物" data-position="社区产品实习生" data-batch="日常实习" data-base="上海" data-apply-link="https://www.dewu.com/jobs" data-favorite="true"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#e5f3ee;--logo-ink:#3d7961">DW</span><div><strong>得物</strong><span>社区产品实习生</span></div></div></td><td><span class="badge badge-blue">已投递</span></td><td>—</td><td>日常实习</td><td>上海</td><td><a class="table-link" href="https://www.dewu.com/jobs" target="_blank" rel="noreferrer">投递链接</a></td><td><button class="link-button" type="button" data-view-jd-row>查看 JD</button></td><td class="mono">2026-08-23</td><td>牛客</td><td>★</td><td class="mono">2 D</td></tr>
+              <tr data-job-search data-company="飞书" data-position="产品运营实习生" data-batch="日常实习" data-base="北京" data-apply-link="https://www.feishu.cn/jobs" data-favorite="false"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#e4eef8;--logo-ink:#3e6e92">FS</span><div><strong>飞书</strong><span>产品运营实习生</span></div></div></td><td><span class="badge badge-mint">已结束</span></td><td>Offer</td><td>日常实习</td><td>北京</td><td><a class="table-link" href="https://www.feishu.cn/jobs" target="_blank" rel="noreferrer">投递链接</a></td><td><button class="link-button" type="button" data-view-jd-row>查看 JD</button></td><td class="mono">2026-08-03</td><td>内推</td><td>☆</td><td class="mono">8 D</td></tr>
+            </tbody></table></div>
+            <div class="empty-filter" id="table-empty"><strong>没有匹配的岗位</strong>试试更换关键词或批次。</div>
+          </div>
+
+          <div class="job-view" id="job-view-internships">
+            <div class="internship-layout">
+              <div class="panel"><div class="panel-header"><h2>找实习平台</h2><p>常用入口与定向搜索</p><span class="badge badge-gray header-end">8 个来源</span></div><div class="platform-grid">
+                <a class="platform-card" href="https://www.zhipin.com" target="_blank" rel="noreferrer"><strong>BOSS 直聘<svg class="icon icon-sm"><use href="#i-arrow"/></svg></strong><p>综合招聘 · 适合快速沟通与日常实习</p></a>
+                <a class="platform-card" href="https://www.shixiseng.com" target="_blank" rel="noreferrer"><strong>实习僧<svg class="icon icon-sm"><use href="#i-arrow"/></svg></strong><p>实习垂直 · 学生岗位与转正机会</p></a>
+                <a class="platform-card" href="https://www.nowcoder.com/jobs" target="_blank" rel="noreferrer"><strong>牛客网<svg class="icon icon-sm"><use href="#i-arrow"/></svg></strong><p>校招 / 实习 · 面经与网申进度</p></a>
+                <a class="platform-card" href="https://www.liepin.com" target="_blank" rel="noreferrer"><strong>猎聘<svg class="icon icon-sm"><use href="#i-arrow"/></svg></strong><p>综合招聘 · 产品与增长方向</p></a>
+                <a class="platform-card" href="https://www.51job.com" target="_blank" rel="noreferrer"><strong>前程无忧<svg class="icon icon-sm"><use href="#i-arrow"/></svg></strong><p>综合招聘 · 多行业校招岗位</p></a>
+              </div></div>
+              <div class="panel table-panel"><div class="panel-header"><h2>实习公司库</h2><p>岗位搜索器近 15 天搜集</p><div class="header-end"><span class="badge badge-mint">今日新增 6</span><button class="secondary-button" type="button" id="refresh-library" style="min-height:30px"><svg class="icon icon-sm"><use href="#i-refresh"/></svg>刷新机会</button></div></div><table class="data-table"><thead><tr><th>公司 / 岗位</th><th>批次</th><th>截止时间</th><th>情报摘要</th><th>抓取时间</th><th>操作</th></tr></thead><tbody>
+                <tr class="library-row" data-job-search data-company="小米" data-position="AI 产品实习生" data-batch="日常实习" data-favorite="false"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#f7e9df;--logo-ink:#a45e34">MI</span><div><strong>小米</strong><span>AI 产品实习生</span></div></div></td><td><span class="badge badge-gray">日常实习</span></td><td class="mono">09-10</td><td class="source-cell">负责大模型助手场景研究与需求推进，要求每周 4 天。</td><td class="mono">18 MIN</td><td><div class="library-actions"><button class="secondary-button pool-button" type="button">加入岗位池</button><button class="library-icon-button library-favorite" type="button" aria-label="收藏小米 AI 产品实习生" aria-pressed="false" title="收藏"><svg class="icon icon-sm"><use href="#i-star"/></svg></button><button class="library-icon-button library-delete" type="button" aria-label="删除小米 AI 产品实习生" title="删除"><svg class="icon icon-sm"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr class="library-row" data-job-search data-company="滴滴" data-position="用户增长产品实习生" data-batch="日常实习" data-favorite="true"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#f6e4e2;--logo-ink:#a64c42">DD</span><div><strong>滴滴</strong><span>用户增长产品实习生</span></div></div></td><td><span class="badge badge-gray">日常实习</span></td><td class="mono">09-06</td><td class="source-cell">参与增长策略设计、A/B 实验与转化漏斗分析。</td><td class="mono">2 H</td><td><div class="library-actions"><button class="secondary-button pool-button" type="button">加入岗位池</button><button class="library-icon-button library-favorite favorite" type="button" aria-label="取消收藏滴滴 用户增长产品实习生" aria-pressed="true" title="取消收藏"><svg class="icon icon-sm"><use href="#i-star"/></svg></button><button class="library-icon-button library-delete" type="button" aria-label="删除滴滴 用户增长产品实习生" title="删除"><svg class="icon icon-sm"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr class="library-row" data-job-search data-company="vivo" data-position="互联网产品经理" data-batch="秋招" data-favorite="false"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#e2ebf7;--logo-ink:#3c6690">V</span><div><strong>vivo</strong><span>互联网产品经理</span></div></div></td><td><span class="badge badge-blue">秋招</span></td><td class="mono">09-18</td><td class="source-cell">面向内容与服务生态，负责产品规划和跨团队落地。</td><td class="mono">YESTERDAY</td><td><div class="library-actions"><button class="secondary-button pool-button" type="button">加入岗位池</button><button class="library-icon-button library-favorite" type="button" aria-label="收藏 vivo 互联网产品经理" aria-pressed="false" title="收藏"><svg class="icon icon-sm"><use href="#i-star"/></svg></button><button class="library-icon-button library-delete" type="button" aria-label="删除 vivo 互联网产品经理" title="删除"><svg class="icon icon-sm"><use href="#i-trash"/></svg></button></div></td></tr>
+              </tbody></table></div>
+              <div class="empty-filter" id="internship-empty"><strong>没有匹配的实习机会</strong>试试更换搜索词或招聘批次。</div>
+            </div>
+          </div>
+          <div class="job-view" id="job-view-portals">
+            <div class="page-heading"><div><p class="eyebrow" id="campus-eyebrow">CAMPUS PORTALS</p><h1 id="campus-title">校招官网入口</h1><p>分层整理官方入口，粘贴网址自动解析并归类，避开失效链接。</p></div><div class="heading-actions"><button class="secondary-button" type="button" id="check-portals"><svg class="icon icon-sm"><use href="#i-refresh"/></svg>检查更新</button><button class="primary-button" type="button" id="add-portal"><svg class="icon icon-sm"><use href="#i-plus"/></svg>添加入口</button></div></div>
+            <div class="portal-toolbar">
+              <span class="portal-toolbar-label">分组依据</span>
+              <div class="segmented" role="tablist" aria-label="入口分组方式">
+                <button class="segment active" type="button" data-group-by="category" role="tab">分类</button>
+                <button class="segment" type="button" data-group-by="rating" role="tab">推荐评级</button>
+                <button class="segment" type="button" data-group-by="none" role="tab">不分组</button>
+              </div>
+              <span class="portal-toolbar-tip">分类与评级均为可自定义标签</span>
+            </div>
+            <div class="portal-groups" id="portal-groups"></div>
+            <div class="empty-filter" id="portal-empty" hidden><strong>还没有任何入口</strong>点击「添加入口」粘贴校招官网网址开始。</div>
+          </div>
+          <dialog id="add-portal-dialog">
+            <div class="dialog-head"><h2 id="add-portal-title">添加校招入口</h2><button class="icon-button" type="button" id="add-portal-close" aria-label="关闭"><svg class="icon"><use href="#i-x"/></svg></button></div>
+            <div class="dialog-body">
+              <div class="form-field span-2">
+                <label for="pf-url">校招官网网址 *</label>
+                <input class="text-input" id="pf-url" type="url" placeholder="https://jobs.bytedance.com/campus" autocomplete="off" />
+                <p class="form-hint" id="pf-parse-hint">粘贴网址后自动解析公司名与分类，可手动调整。</p>
+              </div>
+              <div class="dialog-grid">
+                <div class="form-field"><label for="pf-name">公司 / 入口名</label><input class="text-input" id="pf-name" placeholder="如 字节跳动" autocomplete="off" /></div>
+                <div class="form-field"><label for="pf-category">分类（可自定义）</label><input class="text-input" id="pf-category" list="pf-category-list" placeholder="如 互联网大厂 / 自定义类别" autocomplete="off" /><datalist id="pf-category-list"></datalist></div>
+                <div class="form-field"><label for="pf-rating">推荐评级（可自定义）</label><input class="text-input" id="pf-rating" list="pf-rating-list" placeholder="如 5分 / 4分" autocomplete="off" /><datalist id="pf-rating-list"></datalist></div>
+                <div class="form-field"><label for="pf-status">状态</label><select class="select-input" id="pf-status"><option>开放中</option><option>分批开放</option><option>即将截止</option><option>已结束</option><option>持续更新</option></select></div>
+                <div class="form-field"><label for="pf-batch">批次 / 方向</label><input class="text-input" id="pf-batch" placeholder="如 秋招 / 日常实习" autocomplete="off" /></div>
+                <div class="form-field"><label for="pf-note">备注</label><input class="text-input" id="pf-note" placeholder="如 产品经理 / 产品运营方向" autocomplete="off" /></div>
+              </div>
+            </div>
+            <div class="dialog-actions">
+              <button class="secondary-button" type="button" id="add-portal-cancel">取消</button>
+              <button class="primary-button" type="button" id="add-portal-save">添加入口</button>
+            </div>
+          </dialog>
+        </section>
+          <dialog id="settings-dialog">
+            <div class="dialog-head"><h2>设置</h2><button class="icon-button" type="button" id="settings-close" aria-label="关闭"><svg class="icon"><use href="#i-x"/></svg></button></div>
+            <div class="dialog-body">
+              <div class="segmented settings-tabs" role="tablist" aria-label="设置分区" id="settings-tabs">
+                <button class="segment active" type="button" data-settings-tab="account" role="tab"><svg class="icon icon-sm"><use href="#i-user"/></svg>账号</button>
+                <button class="segment" type="button" data-settings-tab="api" role="tab"><svg class="icon icon-sm"><use href="#i-zap"/></svg>API 接口</button>
+              </div>
+
+              <div class="settings-pane" id="settings-account-pane">
+                <div class="settings-section">
+                  <div class="settings-section-title"><svg class="icon icon-sm"><use href="#i-shield"/></svg>登录账号</div>
+                  <div class="settings-account-row" id="settings-account-row"></div>
+                </div>
+                <div class="settings-section">
+                  <div class="settings-section-title"><svg class="icon icon-sm"><use href="#i-edit"/></svg>个人资料</div>
+                  <div class="dialog-grid">
+                    <div class="form-field"><label for="st-nickname">昵称</label><input class="text-input" id="st-nickname" placeholder="如 欣睿" autocomplete="off" maxlength="20" /></div>
+                    <div class="form-field"><label for="st-direction">岗位方向</label><input class="text-input" id="st-direction" placeholder="如 AI 产品经理" autocomplete="off" maxlength="30" /></div>
+                  </div>
+                  <p class="form-hint">昵称显示在顶栏与侧栏；岗位方向用于岗位搜索推荐与 JD 匹配。</p>
+                </div>
+              </div>
+
+              <div class="settings-pane" id="settings-api-pane" hidden>
+                <div class="settings-section">
+                  <div class="settings-section-title"><svg class="icon icon-sm"><use href="#i-zap"/></svg>大模型 API</div>
+                  <div class="dialog-grid">
+                    <div class="form-field"><label for="st-provider">服务商</label><select class="select-input" id="st-provider">
+                      <option value="deepseek">DeepSeek</option>
+                      <option value="volcano">火山引擎（豆包）</option>
+                      <option value="moonshot">Moonshot Kimi</option>
+                      <option value="zhipu">智谱 AI（GLM）</option>
+                      <option value="qwen">通义千问</option>
+                      <option value="openai">OpenAI</option>
+                      <option value="custom">自定义</option>
+                    </select></div>
+                    <div class="form-field"><label for="st-model">模型</label><input class="text-input" id="st-model" list="st-model-list" placeholder="如 deepseek-chat" autocomplete="off" /><datalist id="st-model-list"></datalist></div>
+                    <div class="form-field span-2"><label for="st-key">API Key</label><input class="text-input" id="st-key" type="password" placeholder="sk-…（仅保存在本机浏览器）" autocomplete="off" /></div>
+                    <div class="form-field span-2"><label for="st-baseurl">接口地址 Base URL</label><input class="text-input" id="st-baseurl" placeholder="https://api.deepseek.com" autocomplete="off" /></div>
+                  </div>
+                  <p class="form-hint">切换服务商会自动填充地址与默认模型。该接口供简历智能改写等 AI 能力调用；Key 仅存于本机 localStorage，不会上传。浏览器直连可能受 CORS 限制，生产环境建议经后端代理。</p>
+                </div>
+              </div>
+            </div>
+            <div class="dialog-actions">
+              <button class="secondary-button" type="button" id="settings-cancel">取消</button>
+              <button class="primary-button" type="button" id="settings-save">保存设置</button>
+            </div>
+          </dialog>
+
+        <section class="page" id="page-resume" aria-labelledby="resume-title">
+          <div class="page-heading"><div><p class="eyebrow">RESUME STUDIO · 3 VERSIONS</p><h1 id="resume-title">个人简历</h1><p>用同一段经历，对准不同岗位讲出最有说服力的版本。</p></div><div class="heading-actions"><button class="secondary-button" type="button" id="duplicate-resume"><svg class="icon icon-sm"><use href="#i-file"/></svg>复制版本</button><button class="secondary-button" type="button" id="upload-resume"><svg class="icon icon-sm"><use href="#i-upload"/></svg>上传简历</button><input type="file" id="resume-file" accept=".pdf,.docx,.doc,.txt,.md,.markdown" hidden /><button class="secondary-button" type="button" id="download-resume"><svg class="icon icon-sm"><use href="#i-download"/></svg>导出 PDF</button><button class="secondary-button" type="button" id="generate-from-job"><svg class="icon icon-sm"><use href="#i-spark"/></svg>从岗位生成</button><button class="secondary-button" type="button" id="polish-resume"><svg class="icon icon-sm"><use href="#i-refresh"/></svg>智能改写</button><button class="primary-button" type="button" id="edit-resume"><svg class="icon icon-sm"><use href="#i-edit"/></svg><span>编辑简历</span></button></div></div>
+          <div class="resume-layout">
+            <aside class="panel"><div class="panel-header"><h2>简历版本</h2><button class="text-link header-end" type="button" id="new-resume"><svg class="icon icon-sm"><use href="#i-plus"/></svg>新建</button></div><div class="version-list">
+              <button class="version-card active" type="button" data-resume="byte"><strong>字节 · AI 产品_v3</strong><span>目标：AI 产品经理实习生</span><div class="version-meta"><span class="badge badge-mint">匹配 86%</span><span>今天更新</span></div></button>
+              <button class="version-card" type="button" data-resume="red"><strong>小红书 · 增长_v2</strong><span>目标：增长产品实习生</span><div class="version-meta"><span class="badge badge-butter">匹配 78%</span><span>昨天更新</span></div></button>
+              <button class="version-card" type="button" data-resume="general"><strong>产品通用版_v5</strong><span>目标：产品经理 / 产品运营</span><div class="version-meta"><span class="badge badge-gray">通用版本</span><span>3 天前</span></div></button>
+            </div></aside>
+
+            <article class="panel resume-paper" id="resume-paper" contenteditable="false" aria-label="简历内容">
+              <h2 class="resume-name" id="resume-name">陈欣睿</h2><p class="resume-role" id="resume-role">AI 产品经理实习生 · 2027 届</p><div class="resume-contact"><span>Shanghai, CN</span><span>xinrui.pm@example.com</span><span>+86 138 0000 2026</span><span>portfolio.example.com</span></div><div class="resume-rule"></div>
+              <section class="resume-section"><h3>Education · 教育经历</h3><div class="resume-item"><div class="resume-item-head"><strong>同济大学 · 信息管理与信息系统</strong><span>2023.09 — 2027.06</span></div><p>GPA 3.7/4.0 · 专业前 15% · 主修产品设计、数据分析、用户研究与机器学习基础</p></div></section>
+              <section class="resume-section" id="experience-section"><h3>Experience · 实习经历</h3><div class="resume-item"><div class="resume-item-head"><strong id="resume-company">某头部内容平台 · 产品实习生</strong><span>2026.03 — 2026.08</span></div><ul id="resume-experience"><li>围绕 AI 搜索场景完成 18 次用户访谈，提炼 4 类核心意图并推动召回策略迭代。</li><li>搭建“曝光—点击—采纳”效果漏斗，定位回答采纳率瓶颈，推动核心指标提升 12.6%。</li><li>协同算法、设计和研发完成 3 个版本迭代，独立输出 PRD、埋点方案与上线复盘。</li></ul></div><div class="resume-item"><div class="resume-item-head"><strong>校园创业团队 · 增长负责人</strong><span>2025.06 — 2025.12</span></div><ul><li>从 0 到 1 设计冷启动增长实验，8 周内获取 3,200 名有效用户，次周留存提升至 31%。</li><li>建立渠道归因表与周度复盘机制，将单个有效用户获取成本降低 38%。</li></ul></div></section>
+              <section class="resume-section"><h3>Projects · 项目经历</h3><div class="resume-item"><div class="resume-item-head"><strong>Offer OS · AI 求职工作台</strong><span>2026.08</span></div><p>定义岗位、日程、简历和模拟面试的一体化工作流，完成数据模型、信息架构和可交互原型；通过 JD 驱动简历建议和模拟面试问题。</p></div></section>
+              <section class="resume-section"><h3>Skills · 技能</h3><div class="resume-item"><p id="resume-skills">产品：需求分析 / 用户研究 / PRD / 原型设计　数据：SQL / Excel / A/B Test　工具：Figma / 飞书多维表格 / Python　英语：CET-6</p></div></section>
+            </article>
+
+            <aside class="panel suggestions-panel"><div class="panel-header"><svg class="icon icon-sm"><use href="#i-spark"/></svg><h2>JD 智能建议</h2><span class="badge badge-lilac header-end">AI</span></div><div class="suggestion-score"><div class="score-ring"><strong id="match-score">86</strong></div><div class="score-label">与当前目标岗位匹配度</div></div><div class="suggestion-list">
+              <div class="suggestion"><strong><span class="badge badge-mint">优势</span>数据闭环完整</strong><p>“召回策略—指标—结果”表达具体，能直接回应 JD 的效果评估要求。</p></div>
+              <div class="suggestion"><strong><span class="badge badge-butter">补充</span>强化模型理解</strong><p>建议补充你对 RAG、评测集或 Prompt 迭代的实际理解。</p></div>
+              <div class="suggestion"><strong><span class="badge badge-blue">改写</span>突出主导动作</strong><p>第二段可将“协同完成”改为“主导需求拆解并推动三方交付”。</p></div>
+            </div><div class="ai-draft" id="ai-draft" hidden></div><div class="keyword-cloud"><p>JD 关键词覆盖</p><span class="badge badge-mint">用户研究</span><span class="badge badge-mint">指标体系</span><span class="badge badge-blue">大模型</span><span class="badge badge-butter">RAG</span><span class="badge badge-gray">跨团队</span></div></aside>
+          </div>
+        </section>
+
+                
+
+                  <dialog id="upload-dialog">
+            <div class="dialog-head"><h2>导入简历 · 解析预览</h2><button class="icon-button" type="button" id="upload-close" aria-label="关闭"><svg class="icon"><use href="#i-x"/></svg></button></div>
+            <div class="dialog-body">
+              <p id="upload-file-info" style="margin:0 0 13px;padding:8px 11px;border-radius:8px;background:var(--surface-2);color:var(--muted);font-size:9.5px;"></p>
+              <div class="dialog-grid">
+                <div class="form-field"><label for="up-name">姓名</label><input class="text-input" id="up-name" autocomplete="off" maxlength="30" /></div>
+                <div class="form-field"><label for="up-direction">求职方向（可选）</label><input class="text-input" id="up-direction" placeholder="如 AI 产品经理实习生" autocomplete="off" maxlength="40" /></div>
+                <div class="form-field"><label for="up-email">邮箱</label><input class="text-input" id="up-email" type="email" autocomplete="off" /></div>
+                <div class="form-field"><label for="up-phone">手机</label><input class="text-input" id="up-phone" type="tel" autocomplete="off" maxlength="20" /></div>
+                <div class="form-field span-2"><label for="up-experience">实习 / 工作经历（每行一条要点）</label><textarea class="textarea-input" id="up-experience" rows="7" placeholder="围绕 AI 搜索完成 18 次用户访谈，提炼 4 类核心意图并推动召回策略迭代。&#10;搭建曝光-点击-采纳效果漏斗，定位采纳率瓶颈，推动核心指标提升 12.6%。"></textarea></div>
+                <div class="form-field span-2"><label for="up-skills">技能 / 技术栈</label><textarea class="textarea-input" id="up-skills" rows="3" placeholder="产品：需求分析 / 用户研究 / PRD　数据：SQL / A/B Test　工具：Figma / 飞书"></textarea></div>
+              </div>
+              <label class="upload-option"><input type="checkbox" id="up-append-master" checked /><span>将经历追加到主简历库（参与后续 JD 匹配与「从岗位生成」）</span></label>
+            </div>
+            <div class="dialog-actions">
+              <button class="secondary-button" type="button" id="upload-cancel">取消</button>
+              <button class="primary-button" type="button" id="upload-import">导入为新版本</button>
+            </div>
+          </dialog>
+        </section>
+
+
+        <section class="page" id="page-interview" aria-labelledby="interview-title">
+          <div class="page-heading"><div><p class="eyebrow">MOCK INTERVIEW · 5 SESSIONS</p><h1 id="interview-title">模拟面试</h1><p>把 JD 和简历放进同一个现场，练的不只是答案，也是判断和表达。</p></div><div class="heading-actions"><button class="secondary-button" type="button" id="history-interview"><svg class="icon icon-sm"><use href="#i-clock"/></svg>历史记录</button></div></div>
+          <div class="panel interview-shell">
+            <div class="interview-setup" id="interview-setup">
+              <div class="setup-main"><h2>准备一场有针对性的模拟</h2><p>面试官会结合岗位 JD 和简历版本连续追问，并在结束后给出结构化复盘。</p>
+                <div class="form-grid"><div class="form-field"><label for="interview-job">目标岗位</label><select class="select-input" id="interview-job"><option>字节跳动 · AI 产品经理实习生</option><option>腾讯 · 产品策划实习生</option><option>美团 · 策略产品经理</option><option>小红书 · 增长产品实习生</option></select></div><div class="form-field"><label for="interview-resume">使用简历</label><select class="select-input" id="interview-resume"><option>字节 · AI 产品_v3</option><option>小红书 · 增长_v2</option><option>产品通用版_v5</option></select></div><div class="form-field"><label for="interview-round">模拟轮次</label><select class="select-input" id="interview-round"><option>一面 · 基础与经历</option><option>二面 · 业务与案例</option><option>HR 面 · 动机与价值观</option><option>压力面 · 追问与质疑</option></select></div><div class="form-field"><label for="interview-length">预计时长</label><select class="select-input" id="interview-length"><option>20 分钟 · 5 题</option><option>35 分钟 · 8 题</option><option>50 分钟 · 12 题</option></select></div></div>
+                <div class="mode-grid" role="radiogroup" aria-label="题型"><div class="mode-option"><input type="radio" name="mode" id="mode-mixed" value="混合题型" checked><label for="mode-mixed"><strong>混合题型</strong><span>专业、行为、案例和简历深挖</span></label></div><div class="mode-option"><input type="radio" name="mode" id="mode-case" value="案例题"><label for="mode-case"><strong>业务案例</strong><span>现场拆解产品与增长场景</span></label></div><div class="mode-option"><input type="radio" name="mode" id="mode-resume" value="简历深挖"><label for="mode-resume"><strong>简历深挖</strong><span>围绕每段经历连续追问</span></label></div></div>
+                <div class="setup-start"><button class="primary-button" type="button" id="start-interview"><svg class="icon icon-sm"><use href="#i-mic"/></svg>开始模拟面试</button><span class="setup-note">演示模式 · 不会调用摄像头或麦克风</span></div>
+              </div>
+              <aside class="setup-aside"><div class="brief-card"><div class="brief-label">Current target</div><h3>字节跳动 · AI 产品经理实习生</h3><p>匹配度 86% · 重点能力：用户洞察、模型效果评估、跨团队推进。</p></div><div class="brief-card"><div class="brief-label">Last session</div><h3>综合评分 82 · 8 月 24 日</h3><p>案例拆解清晰，但方案取舍和失败复盘仍可更具体。</p></div><ul class="prep-list"><li><span class="check"><svg class="icon icon-sm"><use href="#i-check"/></svg></span>岗位 JD 已解析，提取 12 个核心信号</li><li><span class="check"><svg class="icon icon-sm"><use href="#i-check"/></svg></span>简历版本已关联，匹配度 86%</li><li><span class="check"><svg class="icon icon-sm"><use href="#i-check"/></svg></span>已生成面试官风格与追问路径</li></ul></aside>
+            </div>
+
+            <div class="interview-live" id="interview-live"><div class="live-top"><span class="live-dot"></span><div class="live-title"><strong>模拟面试进行中</strong><span id="live-context">字节跳动 · 一面 · 混合题型</span></div><span class="timer" id="interview-timer">00:00</span><button class="danger-button" type="button" id="end-interview">结束面试</button></div><div class="live-body"><div class="conversation"><span class="question-index" id="question-index">QUESTION 1 / 5</span><div class="question-progress"><span id="question-progress"></span></div><div class="ai-bubble"><div class="ai-label"><span class="assistant-icon" style="width:22px;height:22px;border-radius:6px"><svg class="icon icon-sm"><use href="#i-bot"/></svg></span>AI 面试官</div><p id="question-text">请用两分钟介绍一下你自己，并重点说明为什么你想做 AI 产品经理。</p></div><div class="answer-box"><textarea class="textarea-input" id="answer-input" placeholder="在这里输入你的回答。可以用 STAR 结构，但不必为了结构牺牲真实感。"></textarea><div class="answer-actions"><span class="answer-hint">⌘ + Enter 提交回答</span><button class="secondary-button" type="button" id="pause-hint"><svg class="icon icon-sm"><use href="#i-help"/></svg>给我提示</button><button class="primary-button" type="button" id="submit-answer">提交并继续<svg class="icon icon-sm"><use href="#i-chevron"/></svg></button></div></div></div><aside class="live-aside"><h3>实时表达信号</h3><div class="signal"><strong>结构清晰度 <span>良好</span></strong><div class="signal-bar"><span style="--width:78%;--bar:#718f7a"></span></div></div><div class="signal"><strong>岗位相关度 <span>较高</span></strong><div class="signal-bar"><span style="--width:84%;--bar:#6f8fae"></span></div></div><div class="signal"><strong>信息密度 <span>适中</span></strong><div class="signal-bar"><span style="--width:67%;--bar:#b09157"></span></div></div><div class="tip-card"><strong>提示</strong><br>先说结论，再用一个最能证明它的经历展开。不要在第一题里讲完所有故事。</div></aside></div></div>
+
+            <div class="interview-result" id="interview-result"><div class="result-head"><div class="result-score"><div><strong>86</strong><span>综合评分</span></div></div><div class="result-copy"><span class="badge badge-mint">本次 +4 分</span><h2>表达更聚焦，案例还可以更锋利</h2><p id="result-meta">字节跳动 · AI 产品经理一面 · 5 个问题 · 08:42</p></div></div><div class="result-grid"><article class="result-card"><h3>做得好的地方</h3><ul><li>自我介绍能快速建立“用户洞察 + 数据验证”的能力主线。</li><li>回答会主动回到业务目标，较少停留在功能层。</li><li>面对追问时能给出过程和结果，可信度较高。</li></ul></article><article class="result-card"><h3>下一次重点改进</h3><ul><li>案例题先明确北极星指标，再讨论方案优先级。</li><li>少用“我们”，把自己的判断、动作和影响说得更具体。</li><li>准备一个失败案例，说明如何修正错误假设。</li></ul></article></div><div class="result-actions"><button class="primary-button" type="button" id="restart-interview"><svg class="icon icon-sm"><use href="#i-refresh"/></svg>再练一次</button><button class="secondary-button" type="button" data-section-jump="resume"><svg class="icon icon-sm"><use href="#i-file"/></svg>根据复盘改简历</button><button class="ghost-button" type="button" data-toast="复盘已保存到历史记录">保存复盘</button></div></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-review" aria-labelledby="review-title">
+          <div class="page-heading"><div><p class="eyebrow">REVIEW · 本地保存</p><h1 id="review-title">复盘</h1><p>把面试或模拟的逐字稿贴进来，沉淀 AI 结构化建议与你的个人反思、下一步动作。所有内容只存在你自己的浏览器里。</p></div><div class="heading-actions"><button class="secondary-button" type="button" id="review-new"><svg class="icon icon-sm"><use href="#i-plus"/></svg>新建复盘</button></div></div>
+          <div class="review-layout">
+            <aside class="panel review-list" id="review-list-panel">
+              <div class="review-list-head"><span class="review-list-title">我的复盘</span><span class="badge badge-blue" id="review-count">0</span></div>
+              <div class="review-list-items" id="review-list"></div>
+            </aside>
+            <div class="panel review-editor">
+              <div class="form-field"><label for="review-title-input">主题 / 岗位</label><input class="text-input" id="review-title-input" placeholder="例如：字节 · AI 产品一面" /></div>
+              <div class="form-field"><label for="review-transcript">原始逐字稿</label><textarea class="textarea-input" id="review-transcript" placeholder="粘贴完整对话记录，内容会原样保留，不会被删改。"></textarea></div>
+              <div class="review-suggestion" id="review-suggestion" hidden><h3>AI 结构化建议 · 仅供参考</h3><ul id="review-suggestion-list"></ul></div>
+              <div class="form-field"><label for="review-reflection">个人反思</label><textarea class="textarea-input" id="review-reflection" placeholder="哪些答得好？哪里卡住了？下次怎么调整？"></textarea></div>
+              <div class="form-field"><label for="review-actions">下一步动作</label><textarea class="textarea-input" id="review-actions" placeholder="要补的案例、要练的题型、要改的简历段落…"></textarea></div>
+              <div class="review-actions-row">
+                <button class="secondary-button" type="button" id="review-suggest"><svg class="icon icon-sm"><use href="#i-spark"/></svg>生成建议</button>
+                <button class="primary-button" type="button" id="review-save"><svg class="icon icon-sm"><use href="#i-check"/></svg>保存复盘</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="add-job-dialog"><form method="dialog" id="add-job-form"><div class="dialog-head"><h2>添加岗位</h2><button class="icon-button dialog-close" type="button" aria-label="关闭"><svg class="icon icon-sm"><use href="#i-x"/></svg></button></div><div class="dialog-body"><div class="form-section"><h3 class="form-section-title">基础信息</h3><div class="dialog-grid"><div class="form-field"><label for="new-company">公司</label><input class="text-input" id="new-company" name="company" required placeholder="例如：字节跳动" /></div><div class="form-field"><label for="new-position">岗位名称</label><input class="text-input" id="new-position" name="position" required placeholder="例如：AI 产品实习生" /></div><div class="form-field"><label for="new-base">Base 地</label><input class="text-input" id="new-base" name="base" placeholder="例如：北京 / 上海 / 远程" /></div><div class="form-field"><label for="new-batch">招聘批次</label><select class="select-input" id="new-batch" name="batch"><option>日常实习</option><option>暑期实习</option><option>秋招</option><option>春招</option></select></div><div class="form-field"><label for="new-priority">优先级</label><select class="select-input" id="new-priority" name="priority"><option value="P0">P0 · 必投</option><option value="P1" selected>P1 · 重点</option><option value="P2">P2 · 顺投</option></select></div></div></div><div class="form-section"><h3 class="form-section-title">投递方式</h3><div class="dialog-grid"><div class="form-field"><label for="new-email">邮箱</label><input class="text-input" id="new-email" name="email" type="email" placeholder="hr@company.com" /></div><div class="form-field"><label for="new-link">投递链接</label><input class="text-input" id="new-link" name="apply_link" type="url" placeholder="https://jobs.company.com/..." /></div><div class="form-field"><label for="new-referral">内推码</label><input class="text-input" id="new-referral" name="referral_code" placeholder="选填" /></div><div class="form-field"><label for="new-other">其他</label><input class="text-input" id="new-other" name="other" placeholder="微信 / 电话 / 备注等" /></div></div></div><div class="form-section"><h3 class="form-section-title">JD</h3><div class="dialog-grid"><div class="form-field span-2"><div class="field-label-row"><label for="new-jd">JD 链接或摘要</label><button class="ghost-button sm" type="button" id="format-jd-btn">整理格式</button></div><textarea class="textarea-input" id="new-jd" name="jd" placeholder="粘贴 JD 链接或职位描述，点击「整理格式」可规整排版（不删改内容）。"></textarea></div></div></div></div><div class="dialog-actions"><button class="secondary-button dialog-close" type="button">取消</button><button class="primary-button" value="submit" type="submit"><svg class="icon icon-sm"><use href="#i-plus"/></svg>加入岗位池</button></div></form></dialog>
+  <dialog id="jd-dialog"><div class="dialog-head"><h2>JD · <span id="jd-dialog-title"></span></h2><button class="icon-button dialog-close" type="button" aria-label="关闭"><svg class="icon icon-sm"><use href="#i-x"/></svg></button></div><div class="dialog-body"><pre class="jd-view" id="jd-view"></pre></div><div class="dialog-actions"><button class="secondary-button dialog-close" type="button">关闭</button></div></dialog>
+  <dialog id="job-detail-dialog"><div class="detail-header"><div class="detail-logo" id="detail-logo"></div><div class="detail-titles"><div class="detail-company" id="detail-company"></div><h2 class="detail-position" id="detail-position"></h2><div class="detail-tags" id="detail-tags"></div></div><span class="detail-status badge badge-gray" id="detail-status"></span><button class="icon-button dialog-close" type="button" aria-label="关闭"><svg class="icon icon-sm"><use href="#i-x"/></svg></button></div><div class="detail-body"><div class="detail-section"><h3 class="detail-section-title">基础信息</h3><div class="detail-info-grid" id="detail-info"></div></div><div class="detail-section"><h3 class="detail-section-title">投递方式</h3><div class="detail-delivery" id="detail-delivery"></div></div><div class="detail-section"><h3 class="detail-section-title">JD 描述</h3><pre class="detail-jd" id="detail-jd"></pre></div></div><div class="detail-footer"><button class="secondary-button" type="button" id="detail-mock"><svg class="icon icon-sm"><use href="#i-mic"/></svg>模拟面试</button><button class="ghost-button" type="button" id="detail-follow">记录跟进</button><button class="danger-button" type="button" id="detail-delete"><svg class="icon icon-sm"><use href="#i-trash"/></svg>删除岗位</button></div></dialog>
+
+  <dialog id="gen-job-dialog"><div class="dialog-head"><h2>从岗位 JD 生成简历</h2><button class="icon-button dialog-close" type="button" id="gen-job-close" aria-label="关闭"><svg class="icon icon-sm"><use href="#i-x"/></svg></button></div><div class="dialog-body"><p style="margin:0 0 12px;color:var(--muted);font-size:10px;line-height:1.6">选择看板中的岗位，系统会解析其 JD，按匹配度重排你的真实经历并给出缺口建议（规则匹配，不编造经历）。</p><div class="gen-job-list" id="gen-job-list"></div></div><div class="dialog-actions"><button class="ghost-button" type="button" id="gen-job-cancel">取消</button><button class="primary-button" type="button" id="gen-job-confirm" disabled>生成适配简历</button></div></dialog>
+
+  <dialog id="llm-config-dialog"><div class="dialog-head"><h2>配置 LLM 智能改写</h2><button class="icon-button dialog-close" type="button" id="llm-close" aria-label="关闭"><svg class="icon icon-sm"><use href="#i-x"/></svg></button></div><div class="dialog-body"><div class="llm-row"><label for="llm-base">API Base URL</label><input class="text-input" id="llm-base" placeholder="https://api.openai.com/v1" /></div><div class="llm-row"><label for="llm-key">API Key</label><input class="text-input" id="llm-key" type="password" placeholder="sk-..." /></div><div class="llm-row"><label for="llm-model">模型</label><input class="text-input" id="llm-model" placeholder="gpt-4o-mini" /></div><p style="margin:0;color:var(--muted);font-size:9px;line-height:1.6">密钥仅保存在本浏览器 localStorage，不会上传到任何服务器。智能改写结果一律标注「仅供参考」，请人工核对后采纳。</p></div><div class="dialog-actions"><button class="ghost-button" type="button" id="llm-cancel">取消</button><button class="primary-button" type="button" id="llm-save">保存并改写</button></div></dialog>
+
+  <dialog id="tool-dialog"><div class="dialog-head"><h2 id="tool-dialog-title">工具详情</h2><button class="icon-button dialog-close" type="button" aria-label="关闭"><svg class="icon icon-sm"><use href="#i-x"/></svg></button></div><div class="dialog-body" id="tool-dialog-body"></div><div class="dialog-actions"><button class="secondary-button dialog-close" type="button">稍后</button><button class="primary-button" id="tool-primary" type="button">打开工具</button></div></dialog>
+
+  <aside class="assistant-drawer" id="assistant-drawer" aria-label="Career Copilot"><div class="drawer-head"><span class="assistant-icon"><svg class="icon icon-sm"><use href="#i-spark"/></svg></span><div class="drawer-title"><strong>Career Copilot</strong><span>结合你的岗位、简历和日程回答</span></div><button class="icon-button" id="close-assistant" type="button" aria-label="关闭助手"><svg class="icon icon-sm"><use href="#i-x"/></svg></button></div><div class="chat" id="chat"><div class="chat-date">今天 · 上下文已连接</div><div class="chat-bubble">下午好，欣睿。字节一面还有 38 小时。你可以让我帮你检查准备清单、拆一个案例题，或把刚才的模拟复盘改进项写进简历。</div></div><div class="quick-prompts"><button class="quick-prompt" type="button">检查字节面试准备</button><button class="quick-prompt" type="button">拆解小红书 JD</button><button class="quick-prompt" type="button">生成今晚复盘</button></div><form class="chat-compose" id="chat-form"><input class="text-input" id="chat-input" placeholder="问问你的求职工作台…" autocomplete="off" /><button class="primary-button" type="submit" aria-label="发送">发送</button></form></aside>
+
+  <div class="toast" id="toast" role="status"><svg class="icon icon-sm"><use href="#i-check"/></svg><span id="toast-text">已完成</span></div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

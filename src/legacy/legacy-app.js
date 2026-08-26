@@ -84,6 +84,9 @@
         showToast('已整理格式，内容未删改');
       });
 
+      const filterJobs = () => {};
+
+      if (!window.__OFFER_OS_FEATURES__?.jobs) {
       $('#add-job-form').addEventListener('submit', (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -487,6 +490,78 @@
         });
       };
       bindDynamicActions();
+      }
+
+      const openPersistentJobDetail = (card) => {
+        const dlg = $('#job-detail-dialog');
+        const company = card.dataset.company || '';
+        const position = card.dataset.position || '';
+        const base = card.dataset.base || '';
+        const batch = card.dataset.batch || '';
+        const logo = card.querySelector('.company-logo');
+        const logoBox = $('#detail-logo');
+        if (logo) { logoBox.textContent = logo.textContent; logoBox.style.cssText = logo.getAttribute('style') || ''; }
+        logoBox.className = 'detail-logo';
+        $('#detail-company').textContent = company;
+        $('#detail-position').textContent = position;
+        const status = card.querySelector('.job-status');
+        const statusBox = $('#detail-status');
+        if (status) {
+          const cls = (status.getAttribute('class') || '').split(/\s+/).filter(c => (c === 'badge' || c.startsWith('badge-')) && c !== 'job-status');
+          statusBox.className = 'detail-status ' + cls.join(' ');
+          statusBox.textContent = status.textContent.trim();
+        } else {
+          statusBox.className = 'detail-status badge badge-gray';
+          statusBox.textContent = card.dataset.stage || '关注';
+        }
+        const tagsBox = $('#detail-tags');
+        tagsBox.replaceChildren(...[...card.querySelectorAll('.job-tags .badge')].map((badge) => {
+          const tag = badge.cloneNode(true);
+          tag.classList.remove('job-status');
+          return tag;
+        }));
+        const info = $('#detail-info');
+        info.replaceChildren();
+        const addRow = (label, value) => {
+          if (!value) return;
+          const row = document.createElement('div'); row.className = 'detail-info-item';
+          const labelEl = document.createElement('span'); labelEl.className = 'detail-label'; labelEl.textContent = label;
+          const valueEl = document.createElement('span'); valueEl.className = 'detail-value'; valueEl.textContent = value;
+          row.append(labelEl, valueEl); info.appendChild(row);
+        };
+        addRow('Base 地', base || '未填');
+        addRow('招聘批次', batch || '—');
+        addRow('投递渠道', (card.querySelector('.job-source') || {}).textContent || '手动');
+        const delivery = $('#detail-delivery');
+        delivery.replaceChildren();
+        const addDelivery = (label, value, kind) => {
+          if (!value) return;
+          const row = document.createElement('div'); row.className = 'detail-dv-row';
+          const labelEl = document.createElement('span'); labelEl.className = 'dv-label'; labelEl.textContent = label;
+          const valueEl = document.createElement('span'); valueEl.className = 'dv-value'; valueEl.textContent = value; valueEl.title = value;
+          const action = document.createElement('button'); action.className = 'dv-action'; action.type = 'button';
+          if (kind === 'link') { action.textContent = '打开'; action.addEventListener('click', () => { try { window.open(value, '_blank'); } catch (_) {} }); }
+          else { action.textContent = '复制'; action.addEventListener('click', () => { try { navigator.clipboard.writeText(value); } catch (_) {} showToast('已复制：' + label); }); }
+          row.append(labelEl, valueEl, action); delivery.appendChild(row);
+        };
+        addDelivery('邮箱', card.dataset.email, 'email');
+        addDelivery('投递链接', card.dataset.applyLink, 'link');
+        addDelivery('内推码', card.dataset.referral, 'code');
+        addDelivery('其他', card.dataset.other, 'note');
+        if (!delivery.children.length) {
+          const empty = document.createElement('span'); empty.className = 'detail-empty'; empty.textContent = '暂无投递方式'; delivery.appendChild(empty);
+        }
+        $('#detail-jd').textContent = (card.dataset.jdFormatted || card.dataset.jdRaw || '').trim() || '（该岗位暂无 JD）';
+        $('#detail-mock').onclick = () => {
+          const option = [...$('#interview-job').options].find(item => (company + ' ' + position).includes(item.textContent.split(' · ')[0]));
+          if (option) $('#interview-job').value = option.value;
+          dlg.close(); activateSection('interview'); showToast('已带入当前岗位，准备模拟');
+        };
+        $('#detail-follow').onclick = () => { dlg.close(); showToast('已记录一次跟进'); };
+        $('#detail-delete').onclick = () => { dlg.close(); window.__OFFER_OS_REMOVE_JOB__?.(card.dataset.id, `${company} ${position}`.trim()); };
+        if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+      };
+      window.__OFFER_OS_OPEN_JOB_DETAIL__ = openPersistentJobDetail;
 
       const calendarEvents = [
         { date: '2026-07-29', title: '暑期岗位复盘', time: '20:00', type: 'task' },
@@ -1962,4 +2037,3 @@
 
 
     })();
-  

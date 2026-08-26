@@ -32,7 +32,13 @@ describe('migrateV1', () => {
           <article class="job-card" data-company="Notion" data-position="Product Intern" data-base="上海 / 远程" data-batch="日常实习" data-priority="P1" data-favorite="true"></article>
         </section>
         <section class="kanban-col" data-stage="面试中">
-          <article class="job-card" data-company="Byte" data-position="AI PM" data-base="北京" data-batch="日常实习" data-priority="P0" data-favorite="false"></article>
+          <article class="job-card" data-company="Byte" data-position="AI PM" data-batch="日常实习" data-priority="P0" data-favorite="false"><div class="job-title"><span>Byte · 北京 · 海淀</span></div></article>
+        </section>
+        <section class="kanban-col" data-stage="已投递">
+          <article class="job-card" data-company="OpenAI" data-position="Product Intern"></article>
+          <article class="job-card" data-company="OpenAI" data-position="Product Intern"></article>
+          <article class="job-card" data-company="小红书" data-position="增长产品实习生"></article>
+          <article class="job-card" data-company="小红书" data-position="增长产品实习生"></article>
         </section>
       </div>
     `).window.document;
@@ -44,11 +50,16 @@ describe('migrateV1', () => {
     const jobs = await requestToPromise(db.transaction('jobs').objectStore('jobs').getAll());
     const seedVersion = await requestToPromise(db.transaction('meta').objectStore('meta').get('seedVersion'));
 
-    expect(jobs).toHaveLength(2);
+    expect(jobs).toHaveLength(6);
     expect(jobs.map((job) => job.id).sort()).toEqual([
       'seed-byte-ai-pm',
       'seed-notion-product-intern',
+      'seed-openai-product-intern',
+      'seed-openai-product-intern--2',
+      'seed-小红书-增长产品实习生',
+      'seed-小红书-增长产品实习生--2',
     ]);
+    expect(jobs.find((job) => job.id === 'seed-byte-ai-pm')).toMatchObject({ base: '北京 · 海淀' });
     expect(seedVersion).toEqual({ key: 'seedVersion', value: 1 });
   });
 });

@@ -5,12 +5,12 @@ delete process.env.NO_COLOR;
 export default defineConfig({
   testDir: './tests/e2e',
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL: 'http://127.0.0.1:4174',
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'env -u NO_COLOR npm run dev -- --host 127.0.0.1 --port 4173',
-    url: 'http://127.0.0.1:4173',
+    command: 'env -u NO_COLOR npm run dev -- --host 127.0.0.1 --port 4174',
+    url: 'http://127.0.0.1:4174',
     reuseExistingServer: false,
   },
   // Every Playwright test gets a new browser context, so IndexedDB state is
@@ -26,7 +26,11 @@ export default defineConfig({
     },
     {
       name: 'chromium-mobile-390',
-      use: { ...devices['iPhone 13'], browserName: 'chromium' },
+      use: {
+        ...devices['iPhone 13'],
+        browserName: 'chromium',
+        viewport: { width: 390, height: 664 },
+      },
     },
   ],
 });

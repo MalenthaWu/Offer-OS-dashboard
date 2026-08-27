@@ -17,6 +17,13 @@ describe('Vite shell', () => {
   it('runs the mobile viewport in Chromium', () => {
     const mobileProject = playwrightConfig.projects?.find(({ name }) => name === 'chromium-mobile-390');
     expect(mobileProject?.use.browserName).toBe('chromium');
+    expect(mobileProject?.use.viewport).toEqual({ width: 390, height: 664 });
+  });
+
+  it('uses a dedicated local server port for hermetic browser tests', () => {
+    expect(playwrightConfig.use.baseURL).toBe('http://127.0.0.1:4174');
+    expect(playwrightConfig.webServer.url).toBe('http://127.0.0.1:4174');
+    expect(playwrightConfig.webServer.command).toContain('--port 4174');
   });
 
   it('keeps the legacy fallback JD tags mutable for Vite dependency scanning', () => {

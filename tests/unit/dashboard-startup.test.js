@@ -43,4 +43,26 @@ describe('startLegacyWithDashboard', () => {
     expect(loadLegacy).toHaveBeenCalledOnce();
     expect(initDashboard).toHaveBeenCalledWith({ root, store });
   });
+
+  it('defers dashboard rendering until the initial persistent reload is confirmed', async () => {
+    const target = {
+      __OFFER_OS_DB__: { name: 'offer-os' },
+      __OFFER_OS_FEATURES__: { jobs: false, dashboard: false },
+    };
+    const initDashboard = vi.fn();
+
+    const enabled = await startLegacyWithDashboard({
+      target,
+      root: {},
+      store: {},
+      loadLegacy: vi.fn(async () => {
+        expect(target.__OFFER_OS_FEATURES__.dashboard).toBe(false);
+      }),
+      initDashboard,
+      deferDashboard: true,
+    });
+
+    expect(enabled).toBe(true);
+    expect(initDashboard).not.toHaveBeenCalled();
+  });
 });

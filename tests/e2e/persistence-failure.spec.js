@@ -11,11 +11,11 @@ async function completeDemoLogin(page) {
   await expect(page.locator('#login-gate')).toBeHidden();
 }
 
-async function navigateToJobs(page) {
+async function navigateTo(page, section) {
   if (await page.locator('#mobile-menu').isVisible()) {
     await page.locator('#mobile-menu').click();
   }
-  await page.locator('.nav-item[data-section="jobs"]').click();
+  await page.locator(`.nav-item[data-section="${section}"]`).click();
 }
 
 test('keeps job changes disabled when IndexedDB is unavailable', async ({ page }) => {
@@ -24,12 +24,19 @@ test('keeps job changes disabled when IndexedDB is unavailable', async ({ page }
   });
   await page.goto('./');
   await completeDemoLogin(page);
-  await navigateToJobs(page);
+  await navigateTo(page, 'jobs');
 
   await expect(page.locator('#persistence-unavailable')).toBeVisible();
   await expect(page.locator('#persistence-unavailable')).toContainText('本地存储不可用');
   await expect(page.locator('#top-add-job')).toBeDisabled();
   await expect(page.locator('.add-job-trigger').first()).toBeDisabled();
+
+  await page.getByRole('tab', { name: '实习信息搜集' }).click();
+  const poolButton = page.locator('.pool-button').first();
+  await expect(poolButton).toBeDisabled();
+  await poolButton.evaluate((button) => button.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })));
+  await expect(poolButton).toHaveText('加入岗位池');
+  await expect(page.locator('#toast-text')).not.toContainText('机会已加入岗位看板');
 
   const cardsBefore = await page.locator('#kanban-board .job-card').count();
   await page.locator('#add-job-dialog').evaluate((dialog) => dialog.showModal());
@@ -52,25 +59,28 @@ test('keeps job changes disabled when IndexedDB is unavailable', async ({ page }
 
   await page.reload();
   await completeDemoLogin(page);
-  await navigateToJobs(page);
+  await navigateTo(page, 'jobs');
   await expect(page.locator('.job-card', { hasText: 'Should Not Save' })).toHaveCount(0);
 });
 
 test('keeps job changes disabled when the initial persistent reload fails', async ({ page }) => {
   await page.addInitScript(() => {
     const originalTransaction = IDBDatabase.prototype.transaction;
-    let calls = 0;
     IDBDatabase.prototype.transaction = function patchedTransaction(...args) {
-      calls += 1;
-      if (calls >= 3) throw new Error('Simulated initial reload failure');
+      const [storeNames, mode] = args;
+      if (storeNames === 'jobs' && mode !== 'readwrite') throw new Error('Simulated jobs reload failure');
       return originalTransaction.apply(this, args);
     };
   });
   await page.goto('./');
   await completeDemoLogin(page);
-  await navigateToJobs(page);
+  await navigateTo(page, 'jobs');
 
   await expect(page.locator('#persistence-unavailable')).toBeVisible();
+  await navigateTo(page, 'dashboard');
+  await expect(page.locator('#dashboard-persistence-unavailable')).toBeVisible();
+  await expect(page.locator('.dash-stat strong')).toHaveText(['—', '—', '—', '—']);
+  await expect(page.locator('#heat-grid .heat-cell')).toHaveCount(0);
   await expect(page.locator('#top-add-job')).toBeDisabled();
   await expect.poll(() => page.evaluate(() => window.__OFFER_OS_FEATURES__)).toMatchObject({
     jobs: false,

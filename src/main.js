@@ -55,6 +55,7 @@ await bootstrapOfferOS({
       store,
       loadLegacy: () => import('./legacy/legacy-app.js'),
       initDashboard: initDashboardView,
+      deferDashboard: true,
     });
     if (!hasDatabase) {
       setPersistenceUnavailable(persistence.error);
@@ -68,6 +69,8 @@ await bootstrapOfferOS({
       setPersistenceUnavailable(error);
       return;
     }
+    initDashboardView({ root: document, store });
+    window.__OFFER_OS_FEATURES__.dashboard = true;
     initJobsController({ root: document, store, service, showToast });
     window.__OFFER_OS_FEATURES__.jobs = true;
     window.__OFFER_OS_FEATURES__.backup = initLocalDataControls({

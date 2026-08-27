@@ -13,11 +13,28 @@ function disabledControls(root) {
     '.job-delete',
     '.table-job-delete',
     '.library-delete',
+    '.pool-button',
     '#detail-delete',
     '#local-data-export',
     '#local-data-import',
     '#local-data-file',
   ].join(','));
+}
+
+function disableDashboardData(document) {
+  const dashboard = document.querySelector('#page-dashboard');
+  if (!dashboard) return;
+  dashboard.querySelectorAll('.dash-stat strong').forEach((statistic) => { statistic.textContent = '—'; });
+  dashboard.querySelector('#heat-grid')?.replaceChildren();
+  dashboard.querySelector('#heat-weekdays')?.replaceChildren();
+  dashboard.querySelector('#heat-months')?.replaceChildren();
+
+  const notice = dashboard.querySelector('#dashboard-persistence-unavailable') ?? document.createElement('p');
+  notice.id = 'dashboard-persistence-unavailable';
+  notice.className = 'form-hint';
+  notice.setAttribute('role', 'status');
+  notice.textContent = '仪表盘数据暂不可用：本地存储未能完成读取。';
+  if (!notice.parentNode) dashboard.querySelector('.page-heading')?.after(notice);
 }
 
 function createStatus(document) {
@@ -30,9 +47,10 @@ function createStatus(document) {
     position: 'fixed', top: '12px', left: '50%', transform: 'translateX(-50%)', zIndex: '200',
     maxWidth: 'min(680px, calc(100vw - 24px))', padding: '12px 16px', border: '1px solid #b45b4e',
     borderRadius: '10px', background: '#fff4f1', color: '#5d241b', boxShadow: '0 8px 24px rgba(0,0,0,.15)',
-    fontSize: '14px', lineHeight: '1.5', textAlign: 'center',
+    fontSize: '14px', lineHeight: '1.5', textAlign: 'center', pointerEvents: 'none',
   });
   status.textContent = MESSAGE;
+  disableDashboardData(document);
   document.body?.appendChild(status);
   return status;
 }
@@ -61,7 +79,7 @@ export function disablePersistenceDependentControls({ root = document } = {}) {
     event.stopImmediatePropagation();
   };
   const blockMutation = (event) => {
-    if (!event.target.closest?.('#top-add-job, .add-job-trigger, [data-job-action="delete"], [data-job-action="stage"], .job-delete, .table-job-delete, .library-delete, #detail-delete, #local-data-export, #local-data-import')) return;
+    if (!event.target.closest?.('#top-add-job, .add-job-trigger, [data-job-action="delete"], [data-job-action="stage"], .job-delete, .table-job-delete, .library-delete, .pool-button, #detail-delete, #local-data-export, #local-data-import')) return;
     event.preventDefault();
     event.stopImmediatePropagation();
   };
@@ -73,6 +91,7 @@ export function disablePersistenceDependentControls({ root = document } = {}) {
 
   document.addEventListener('submit', blockSubmit, true);
   document.addEventListener('click', blockMutation, true);
+  document.addEventListener('keydown', blockMutation, true);
   document.addEventListener('dragstart', blockDrag, true);
   document.addEventListener('drop', blockDrag, true);
   document.__OFFER_OS_PERSISTENCE_GUARD__ = true;

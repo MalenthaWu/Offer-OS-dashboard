@@ -1,9 +1,10 @@
-export async function startLegacyWithDashboard({ target, root, store, loadLegacy, initDashboard }) {
+export async function startLegacyWithDashboard({ target, root, store, loadLegacy, initDashboard, deferDashboard = false }) {
   const enabled = Boolean(target.__OFFER_OS_DB__);
-  target.__OFFER_OS_FEATURES__.dashboard = enabled;
+  const initializeDashboard = enabled && !deferDashboard;
+  target.__OFFER_OS_FEATURES__.dashboard = initializeDashboard;
 
   await loadLegacy();
-  if (enabled) initDashboard({ root, store });
+  if (initializeDashboard) initDashboard({ root, store });
 
   return enabled;
 }

@@ -67,7 +67,7 @@ test('opens and safely exercises every retained workspace and utility', async ({
   await page.locator('#settings-close').press('Enter');
 
   for (const [tool, title] of [
-    ['feishu', '飞书同步'],
+    ['feishu', '飞书同步（未连接）'],
     ['scout', '岗位搜索器'],
     ['apply', '网申助手'],
     ['resume-autofill', '简历自动填写'],

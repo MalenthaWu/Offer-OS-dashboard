@@ -3,6 +3,28 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
 (() => {
       const $ = (selector, root = document) => root.querySelector(selector);
       const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+      const SYNC_UNAVAILABLE_NOTICE = '未执行同步：当前未连接飞书，请使用本地导出备份';
+      const setDirectText = (element, text) => {
+        if (!element) return;
+        const textNode = [...element.childNodes].find((node) => node.nodeType === 3);
+        if (textNode) textNode.textContent = text;
+        else element.append(text);
+      };
+
+      const syncState = $('.sync-state');
+      setDirectText(syncState, '云端同步不可用 · 数据仅存本浏览器');
+      const syncDot = $('.sync-dot', syncState);
+      if (syncDot) syncDot.hidden = true;
+      setDirectText($('#sync-jobs'), '云端同步不可用');
+      const feishuToolNav = $('.tool-nav[data-tool="feishu"]');
+      setDirectText(feishuToolNav, '飞书同步（未连接）');
+      const feishuToolState = $('.nav-count', feishuToolNav);
+      if (feishuToolState) {
+        feishuToolState.textContent = '未连接';
+        feishuToolState.removeAttribute('style');
+      }
+      const chatContext = $('.chat-date');
+      if (chatContext) chatContext.textContent = '今天 · 本地演示上下文';
 
       const pages = $$('.page');
       const sectionMeta = {
@@ -808,7 +830,7 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
           showToast(`${label} 已从实习公司库删除`);
         }, 180);
       }));
-      $('#sync-jobs').addEventListener('click', () => showToast('飞书多维表格已同步'));
+      $('#sync-jobs').addEventListener('click', () => showToast(SYNC_UNAVAILABLE_NOTICE));
       $('#refresh-library').addEventListener('click', (event) => { event.currentTarget.querySelector('svg').style.transform = 'rotate(180deg)'; setTimeout(() => event.currentTarget.querySelector('svg').style.transform = '', 400); showToast('已获取 6 条最新机会'); filterJobs(); });
 
       // ---- 实习信息搜集：按求职者自定义方向搜集 ----
@@ -1636,7 +1658,7 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
       $('#history-interview').addEventListener('click', () => showToast('历史：5 场模拟 · 平均分 81 · 最高分 86'));
 
       const toolData = {
-        feishu: { title: '飞书同步', icon: '#i-refresh', intro: '岗位表、面试日程与简历版本保持在同一个数据底座。', points: ['Job / Interview / Resume 三张表已连接', '最近同步：2 分钟前 · 无冲突', '看板筛选和视图偏好仅保留在当前原型'], action: '立即同步' },
+        feishu: { title: '飞书同步（未连接）', icon: '#i-refresh', intro: '当前未连接飞书，此入口仅作为本地演示占位。', points: ['未连接任何飞书多维表格', '没有云端同步记录', '岗位与活动数据仅保存在当前浏览器'], action: '了解本地备份', notice: SYNC_UNAVAILABLE_NOTICE },
         scout: { title: '岗位搜索器', icon: '#i-search', intro: '按目标批次和关键词搜集官方招聘页的新机会。', points: ['关键词：AI 产品经理 / 增长产品', '范围：互联网、AI、消费科技', '近 15 天已搜集 28 条，6 条为今日新增'], action: '运行一次搜索' },
         apply: { title: '网申助手', icon: '#i-zap', intro: '跳转官方网申页时，用预录信息减少重复填写。', points: ['基础资料：已完善 92%', '教育、经历与项目字段已准备', '开放性问答仍需你亲自完成'], action: '打开使用说明' },
         'resume-autofill': { title: '简历自动填写', icon: '#i-magic', intro: '开源双语 Agent：整理可复用的已核验简历信息，自动填写各大招聘网站的申请表。', points: ['来源：GitHub · CCC-Zach/resume-autofill-agent', '修复简历解析错误，避免上传覆盖手填信息', '提交前暂停，等你确认再投递'], action: '打开 GitHub 仓库', link: 'https://github.com/CCC-Zach/resume-autofill-agent' }
@@ -1649,7 +1671,7 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
         $('#tool-primary').textContent = data.action;
         $('#tool-primary').onclick = () => {
           if (data.link) { window.open(data.link, '_blank', 'noopener'); toolDialog.close(); return; }
-          toolDialog.close(); showToast(`${data.title}：演示操作已完成`);
+          toolDialog.close(); showToast(data.notice || `${data.title}：演示操作已完成`);
         };
         if (typeof toolDialog.showModal === 'function') toolDialog.showModal(); else toolDialog.setAttribute('open', '');
       };

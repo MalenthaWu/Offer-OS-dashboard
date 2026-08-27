@@ -48,6 +48,15 @@ describe('Vite shell', () => {
     expect(legacyApp).toContain('数据只保存在当前浏览器');
   });
 
+  it('relabels cloud sync surfaces as unavailable local-demo placeholders', () => {
+    expect(legacyApp).not.toContain('飞书多维表格已同步');
+    expect(legacyApp).not.toContain('Job / Interview / Resume 三张表已连接');
+    expect(legacyApp).not.toContain('最近同步：2 分钟前 · 无冲突');
+    expect(legacyApp).toContain('云端同步不可用');
+    expect(legacyApp).toContain('当前未连接飞书');
+    expect(legacyApp).toContain('未执行同步');
+  });
+
   it('documents the Node versions supported by the locked Vite major', () => {
     expect(readme).toContain('Node.js 22.12+');
     expect(readme).toContain('Node.js 20.19+');

@@ -95,16 +95,18 @@ export function renderDashboard(root, summary) {
 export function initDashboardView({ root, store, today = () => new Date() }) {
   root.__OFFER_OS_DASHBOARD_CLEANUP__?.();
 
+  let disposed = false;
   const render = () => {
     const currentToday = typeof today === 'function' ? today() : today;
     renderDashboard(root, computeDashboard({ ...store.getState(), today: currentToday }));
   };
   let scheduled = false;
   const scheduleRender = () => {
-    if (scheduled) return;
+    if (disposed || scheduled) return;
     scheduled = true;
     queueMicrotask(() => {
       scheduled = false;
+      if (disposed) return;
       render();
     });
   };
@@ -113,6 +115,7 @@ export function initDashboardView({ root, store, today = () => new Date() }) {
   render();
 
   const cleanup = () => {
+    disposed = true;
     unsubscribeJobs();
     unsubscribeActivities();
     if (root.__OFFER_OS_DASHBOARD_CLEANUP__ === cleanup) delete root.__OFFER_OS_DASHBOARD_CLEANUP__;

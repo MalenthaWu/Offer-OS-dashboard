@@ -68,8 +68,14 @@ describe('renderDashboard', () => {
       <div id="heat-grid"></div><div id="heat-tip"></div>`;
     const summary = computeDashboard({
       today: localTime(2026, 7, 26),
-      jobs: [{ stage: '关注' }, { stage: '已投递' }, { stage: '已结束' }],
-      activities: [{ type: '投递', occurredAt: localTime(2026, 7, 26, 9).toISOString() }],
+      jobs: [
+        { stage: '关注' }, { stage: '已投递' }, { stage: '已投递' }, { stage: '已结束' },
+      ],
+      activities: [
+        { type: '投递', occurredAt: localTime(2026, 7, 24, 9).toISOString() },
+        { type: '投递', occurredAt: localTime(2026, 7, 25, 9).toISOString() },
+        { type: '投递', occurredAt: localTime(2026, 7, 26, 9).toISOString() },
+      ],
     });
 
     renderDashboard(document, summary);
@@ -80,8 +86,10 @@ describe('renderDashboard', () => {
     expect(today.dataset.count).toBe('1');
     expect(today.getAttribute('aria-label')).toBe('2026-08-26，1 次投递');
     expect(today.className).toMatch(/heat-level-[0-4]/);
+    expect(summary.stageCounts['已投递']).toBe(2);
+    expect(summary.heatmap.totalApplications).toBe(3);
     expect([...document.querySelectorAll('.dash-stat strong')].map((node) => node.textContent))
-      .toEqual(['3', '1', '1', '1']);
+      .toEqual(['4', '1', '3', '1']);
 
     today.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
     expect(document.querySelector('#heat-tip').textContent).toBe('2026-08-26，1 次投递');
@@ -103,6 +111,25 @@ describe('renderDashboard', () => {
     await Promise.resolve();
 
     expect(replaceChildren).toHaveBeenCalledOnce();
+    cleanup();
+  });
+
+  it('discards a queued render from an instance replaced before the microtask runs', async () => {
+    document.body.innerHTML = `
+      <div class="dash-stat-grid"><article class="dash-stat"><strong></strong></article></div>
+      <div id="heat-grid"></div><div id="heat-tip"></div>`;
+    const store = createAppStore();
+    const grid = document.querySelector('#heat-grid');
+    const replaceChildren = vi.spyOn(grid, 'replaceChildren');
+
+    initDashboardView({ root: document, store });
+    replaceChildren.mockClear();
+    store.setJobs([{ stage: '关注' }]);
+    const cleanup = initDashboardView({ root: document, store });
+    store.setActivities([{ type: '投递', occurredAt: new Date().toISOString() }]);
+    await Promise.resolve();
+
+    expect(replaceChildren).toHaveBeenCalledTimes(2);
     cleanup();
   });
 

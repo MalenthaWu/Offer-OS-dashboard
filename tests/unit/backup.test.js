@@ -257,6 +257,27 @@ describe('local JSON backup', () => {
     expect(reload).not.toHaveBeenCalled();
   });
 
+  it.each([
+    ['applyLink', 'javascript:globalThis.__offerOsUnsafeLink = true'],
+    ['apply_link', 'data:text/html,<script>globalThis.__offerOsUnsafeLink = true</script>'],
+    ['applyLink', '/relative-application-path'],
+    ['apply_link', 'https://user:password@example.com/apply'],
+  ])('rejects unsafe job %s before writing: %s', async (field, applyLink) => {
+    const db = await openTestDatabase();
+    await seed(db, { jobs: [validJob({ id: 'existing-job' })], activities: [validActivity({ id: 'existing-activity', jobId: null })] });
+    const before = await Promise.all([records(db, 'jobs'), records(db, 'activities')]);
+    const transaction = vi.spyOn(db, 'transaction');
+    const reload = vi.fn();
+
+    await expect(importBackup(db, validPayload({ stores: {
+      jobs: [validJob({ [field]: applyLink })], activities: [validActivity()],
+    } }), { mode: 'replace', jobService: { reload } })).rejects.toThrow('备份内容不完整');
+
+    expect(transaction.mock.calls.some(([, mode]) => mode === 'readwrite')).toBe(false);
+    expect(await Promise.all([records(db, 'jobs'), records(db, 'activities')])).toEqual(before);
+    expect(reload).not.toHaveBeenCalled();
+  });
+
   it('rejects unknown import modes before writing', async () => {
     const db = await openTestDatabase();
     await seed(db, { jobs: [{ id: 'existing-job' }] });

@@ -1,4 +1,5 @@
 import { requestToPromise, runTransaction } from './db.js';
+import { isSafeExternalLink } from '../security/external-links.js';
 
 const APP = 'offer-os';
 const SCHEMA_VERSION = 1;
@@ -70,7 +71,8 @@ function validJob(record) {
   if (record.schemaVersion !== SCHEMA_VERSION || !isValidISO(record.createdAt) || !isValidISO(record.updatedAt)) return false;
   if (Object.hasOwn(record, 'order') && !Number.isFinite(record.order)) return false;
   if (Object.hasOwn(record, 'favorite') && typeof record.favorite !== 'boolean') return false;
-  return JOB_STRING_FIELDS.every((field) => !Object.hasOwn(record, field) || typeof record[field] === 'string');
+  return JOB_STRING_FIELDS.every((field) => !Object.hasOwn(record, field) || typeof record[field] === 'string')
+    && ['applyLink', 'apply_link'].every((field) => !Object.hasOwn(record, field) || isSafeExternalLink(record[field]));
 }
 
 function validActivity(record) {

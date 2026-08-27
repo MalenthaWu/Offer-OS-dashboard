@@ -1,4 +1,5 @@
 import { renderJobs } from './jobs-view.js';
+import { isSafeExternalLink } from '../../security/external-links.js';
 
 const asText = (value) => value == null ? '' : String(value);
 
@@ -76,6 +77,10 @@ export function initJobsController({ root, store, service, showToast, onFilter =
     const submittedForm = event.currentTarget;
     const input = formInput(submittedForm);
     if (!input.company || !input.position) return;
+    if (input.applyLink && !isSafeExternalLink(input.applyLink)) {
+      showToast('保存失败：投递链接必须是安全的 http/https 绝对地址');
+      return;
+    }
 
     try {
       await service.create(input);

@@ -1,4 +1,5 @@
 import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
+import { isSafeExternalLink, openExternalLink } from '../security/external-links.js';
 
 (() => {
       const $ = (selector, root = document) => root.querySelector(selector);
@@ -51,6 +52,11 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
         $('#toast').classList.add('show');
         clearTimeout(toastTimer);
         toastTimer = setTimeout(() => $('#toast').classList.remove('show'), 2200);
+      };
+      const openJobLink = (value) => {
+        if (openExternalLink(value)) return true;
+        showToast('无法打开：投递链接必须是安全的 http/https 绝对地址');
+        return false;
       };
 
       const closeMobileNav = () => {
@@ -123,6 +129,10 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
         const other = (data.get('other') || '').toString().trim();
         const jdRaw = (data.get('jd') || '').toString();
         if (!company || !position) return;
+        if (applyLink && !isSafeExternalLink(applyLink)) {
+          showToast('保存失败：投递链接必须是安全的 http/https 绝对地址');
+          return;
+        }
         const stage = '关注';
         const column = $(`.kanban-col[data-stage="${stage}"]`);
         const initial = company.slice(0, 2).toUpperCase();
@@ -307,7 +317,7 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
           const labelEl = document.createElement('span'); labelEl.className = 'dv-label'; labelEl.textContent = label;
           const valueEl = document.createElement('span'); valueEl.className = 'dv-value'; valueEl.textContent = value; valueEl.title = value;
           const act = document.createElement('button'); act.className = 'dv-action'; act.type = 'button';
-          if (kind === 'link') { act.textContent = '打开'; act.addEventListener('click', () => { try { window.open(value, '_blank'); } catch (_) {} }); }
+          if (kind === 'link') { act.textContent = '打开'; act.addEventListener('click', () => openJobLink(value)); }
           else { act.textContent = '复制'; act.addEventListener('click', () => { try { navigator.clipboard.writeText(value); } catch (_) {} showToast('已复制：' + label); }); }
           row.append(labelEl, valueEl, act);
           delivery.appendChild(row);
@@ -564,7 +574,7 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
           const labelEl = document.createElement('span'); labelEl.className = 'dv-label'; labelEl.textContent = label;
           const valueEl = document.createElement('span'); valueEl.className = 'dv-value'; valueEl.textContent = value; valueEl.title = value;
           const action = document.createElement('button'); action.className = 'dv-action'; action.type = 'button';
-          if (kind === 'link') { action.textContent = '打开'; action.addEventListener('click', () => { try { window.open(value, '_blank'); } catch (_) {} }); }
+          if (kind === 'link') { action.textContent = '打开'; action.addEventListener('click', () => openJobLink(value)); }
           else { action.textContent = '复制'; action.addEventListener('click', () => { try { navigator.clipboard.writeText(value); } catch (_) {} showToast('已复制：' + label); }); }
           row.append(labelEl, valueEl, action); delivery.appendChild(row);
         };
@@ -1670,7 +1680,7 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
         $('#tool-dialog-body').innerHTML = `<div class="tool-detail"><div class="tool-hero"><span class="assistant-icon"><svg class="icon"><use href="${data.icon}"/></svg></span><div><h3>${data.title}</h3><p>${data.intro}</p></div></div><ul class="tool-points">${data.points.map(point => `<li><span class="check"><svg class="icon icon-sm"><use href="#i-check"/></svg></span>${point}</li>`).join('')}</ul></div>`;
         $('#tool-primary').textContent = data.action;
         $('#tool-primary').onclick = () => {
-          if (data.link) { window.open(data.link, '_blank', 'noopener'); toolDialog.close(); return; }
+          if (data.link) { openExternalLink(data.link); toolDialog.close(); return; }
           toolDialog.close(); showToast(data.notice || `${data.title}：演示操作已完成`);
         };
         if (typeof toolDialog.showModal === 'function') toolDialog.showModal(); else toolDialog.setAttribute('open', '');

@@ -4,6 +4,8 @@ import { createAppStore } from './app/store.js';
 import { openOfferOSDB } from './data/db.js';
 import { migrateV1 } from './data/migrations.js';
 import { createJobService } from './domain/job-service.js';
+import { startLegacyWithDashboard } from './modules/dashboard/dashboard-startup.js';
+import { initDashboardView } from './modules/dashboard/dashboard-view.js';
 import { initJobsController } from './modules/jobs/jobs-controller.js';
 
 window.__OFFER_OS_FEATURES__ = {
@@ -28,9 +30,16 @@ await bootstrapOfferOS({
   root: document,
   target: window,
   startLegacy: async () => {
-    window.__OFFER_OS_FEATURES__.jobs = Boolean(window.__OFFER_OS_DB__);
-    await import('./legacy/legacy-app.js');
-    if (!window.__OFFER_OS_DB__) return;
+    const hasDatabase = Boolean(window.__OFFER_OS_DB__);
+    window.__OFFER_OS_FEATURES__.jobs = hasDatabase;
+    await startLegacyWithDashboard({
+      target: window,
+      root: document,
+      store,
+      loadLegacy: () => import('./legacy/legacy-app.js'),
+      initDashboard: initDashboardView,
+    });
+    if (!hasDatabase) return;
 
     const service = createJobService({ db: window.__OFFER_OS_DB__, store });
     initJobsController({ root: document, store, service, showToast });

@@ -788,7 +788,7 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
         renderCalendar();
       }));
       renderCalendar();
-      renderHeatmap();
+      if (!window.__OFFER_OS_FEATURES__?.dashboard) renderHeatmap();
 
       $$('.pool-button').forEach(button => button.addEventListener('click', () => {
         button.textContent = '已加入';

@@ -69,6 +69,8 @@ export function initLocalDataControls({
   section.append(title, actions, hint);
   accountPane.append(section);
 
+  let importInFlight = false;
+
   exportButton.addEventListener('click', async () => {
     try {
       const exportedAt = now();
@@ -88,29 +90,40 @@ export function initLocalDataControls({
     }
   });
 
-  importButton.addEventListener('click', () => fileInput.click());
+  importButton.addEventListener('click', () => {
+    if (!importInFlight) fileInput.click();
+  });
   fileInput.addEventListener('change', async () => {
+    if (importInFlight) return;
     const file = fileInput.files?.[0];
-    fileInput.value = '';
     if (!file) return;
 
-    const mode = chooseMode();
-    if (mode !== 'merge' && mode !== 'replace') return;
-    if (mode === 'replace' && !confirmOverwrite(REPLACE_CONFIRMATION)) return;
-
-    let payload;
-    try {
-      payload = JSON.parse(await file.text());
-    } catch {
-      showToast('导入失败：备份文件不是有效的 JSON');
-      return;
-    }
+    importInFlight = true;
+    importButton.disabled = true;
+    fileInput.disabled = true;
 
     try {
+      const mode = chooseMode();
+      if (mode !== 'merge' && mode !== 'replace') return;
+      if (mode === 'replace' && !confirmOverwrite(REPLACE_CONFIRMATION)) return;
+
+      let payload;
+      try {
+        payload = JSON.parse(await file.text());
+      } catch {
+        showToast('导入失败：备份文件不是有效的 JSON');
+        return;
+      }
+
       await importBackup(db, payload, { mode, jobService });
       showToast(mode === 'replace' ? '本地岗位和活动已覆盖导入' : '本地数据已合并导入');
     } catch (error) {
       showToast(`导入失败：${error instanceof Error ? error.message : '未知错误'}`);
+    } finally {
+      fileInput.value = '';
+      fileInput.disabled = false;
+      importButton.disabled = false;
+      importInFlight = false;
     }
   });
 

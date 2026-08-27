@@ -29,14 +29,47 @@ async function seed(db, { jobs = [], activities = [], calendarEvents = [] }) {
   });
 }
 
+const ISO = '2026-08-27T00:00:00.000Z';
+
+function validJob(overrides = {}) {
+  return {
+    id: 'imported-job',
+    company: 'Imported',
+    position: 'Product Manager',
+    base: '',
+    batch: '',
+    priority: '',
+    stage: '关注',
+    order: 0,
+    favorite: false,
+    jdRaw: '',
+    jdFormatted: '',
+    createdAt: ISO,
+    updatedAt: ISO,
+    schemaVersion: 1,
+    ...overrides,
+  };
+}
+
+function validActivity(overrides = {}) {
+  return {
+    id: 'imported-activity',
+    jobId: 'imported-job',
+    type: '关注',
+    occurredAt: ISO,
+    schemaVersion: 1,
+    ...overrides,
+  };
+}
+
 function validPayload(overrides = {}) {
   return {
     app: 'offer-os',
     schemaVersion: 1,
-    exportedAt: '2026-08-27T00:00:00.000Z',
+    exportedAt: ISO,
     stores: {
-      jobs: [{ id: 'imported-job', company: 'Imported', stage: '关注', createdAt: '2026-08-27T00:00:00.000Z' }],
-      activities: [{ id: 'imported-activity', jobId: 'imported-job', type: '关注', occurredAt: '2026-08-27T00:00:00.000Z' }],
+      jobs: [validJob()],
+      activities: [validActivity()],
     },
     ...overrides,
   };
@@ -91,8 +124,8 @@ describe('local JSON backup', () => {
     });
 
     await importBackup(db, validPayload({ stores: {
-      jobs: [{ id: 'shared', company: 'New' }],
-      activities: [{ id: 'new-activity', type: '新记录' }],
+      jobs: [validJob({ id: 'shared', company: 'New' })],
+      activities: [validActivity({ id: 'new-activity', type: '关注' })],
     } }), { mode: 'merge', jobService: { reload } });
 
     expect(await records(db, 'jobs')).toEqual(expect.arrayContaining([
@@ -174,6 +207,40 @@ describe('local JSON backup', () => {
     expect(await records(db, 'activities')).toEqual([expect.objectContaining({ id: 'existing-activity' })]);
   });
 
+  it.each([
+    ['malformed JSON-compatible fields', () => validPayload({ stores: {
+      jobs: [validJob({ company: 42 })], activities: [validActivity()],
+    } })],
+    ['duplicate ids', () => validPayload({ stores: {
+      jobs: [validJob({ id: 'same' }), validJob({ id: 'same', company: 'Other' })], activities: [validActivity()],
+    } })],
+    ['prototype-shaped and accessor records', () => {
+      const record = Object.assign(Object.create({ inherited: true }), validJob());
+      Object.defineProperty(record, 'company', { enumerable: true, get: () => 'Getter' });
+      return validPayload({ stores: { jobs: [record], activities: [validActivity()] } });
+    }],
+    ['reserved prototype keys', () => {
+      const record = validJob();
+      Object.defineProperty(record, '__proto__', { value: 'unsafe', enumerable: true });
+      return validPayload({ stores: { jobs: [record], activities: [validActivity()] } });
+    }],
+    ['uncloneable extra values', () => validPayload({ stores: {
+      jobs: [validJob({ unsupported: () => {} })], activities: [validActivity()],
+    } })],
+  ])('rejects %s before writing or reloading', async (_name, makePayload) => {
+    const db = await openTestDatabase();
+    await seed(db, { jobs: [validJob({ id: 'existing-job' })], activities: [validActivity({ id: 'existing-activity', jobId: null })] });
+    const before = await Promise.all([records(db, 'jobs'), records(db, 'activities')]);
+    const transaction = vi.spyOn(db, 'transaction');
+    const reload = vi.fn();
+
+    await expect(importBackup(db, makePayload(), { mode: 'replace', jobService: { reload } })).rejects.toThrow('备份内容不完整');
+
+    expect(transaction.mock.calls.some(([, mode]) => mode === 'readwrite')).toBe(false);
+    expect(await Promise.all([records(db, 'jobs'), records(db, 'activities')])).toEqual(before);
+    expect(reload).not.toHaveBeenCalled();
+  });
+
   it('rejects unknown import modes before writing', async () => {
     const db = await openTestDatabase();
     await seed(db, { jobs: [{ id: 'existing-job' }] });
@@ -251,5 +318,34 @@ describe('local data settings controls', () => {
     input.dispatchEvent(new Event('change'));
     await vi.waitFor(() => expect(showToast).toHaveBeenCalledWith('导入失败：备份文件不是有效的 JSON'));
     expect(importFn).not.toHaveBeenCalled();
+  });
+
+  it('serializes imports and recovers controls after the first import completes', async () => {
+    let completeImport;
+    const pendingImport = new Promise((resolve) => { completeImport = resolve; });
+    const importFn = vi.fn(() => pendingImport);
+    createControls({ importBackup: importFn });
+    const input = document.querySelector('#local-data-file');
+    const file = { text: async () => JSON.stringify(validPayload()) };
+    Object.defineProperty(input, 'files', { value: [file] });
+
+    input.dispatchEvent(new Event('change'));
+    await vi.waitFor(() => expect(importFn).toHaveBeenCalledOnce());
+    expect(document.querySelector('#local-data-import').disabled).toBe(true);
+    expect(input.disabled).toBe(true);
+
+    const openFilePicker = vi.spyOn(input, 'click').mockImplementation(() => {});
+    document.querySelector('#local-data-import').dispatchEvent(new Event('click'));
+    expect(openFilePicker).not.toHaveBeenCalled();
+    input.dispatchEvent(new Event('change'));
+    expect(importFn).toHaveBeenCalledOnce();
+
+    completeImport();
+    await vi.waitFor(() => expect(document.querySelector('#local-data-import').disabled).toBe(false));
+    expect(input.disabled).toBe(false);
+
+    input.dispatchEvent(new Event('change'));
+    await vi.waitFor(() => expect(importFn).toHaveBeenCalledTimes(2));
+    openFilePicker.mockRestore();
   });
 });

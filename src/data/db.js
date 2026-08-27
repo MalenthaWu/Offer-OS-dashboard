@@ -41,7 +41,22 @@ export function openOfferOSDB(factory = globalThis.indexedDB) {
 
 export async function runTransaction(db, storeNames, mode, worker) {
   const tx = db.transaction(storeNames, mode);
-  const result = await worker(tx);
-  await transactionDone(tx);
-  return result;
+  const done = transactionDone(tx);
+  try {
+    const result = await worker(tx);
+    await done;
+    return result;
+  } catch (error) {
+    try {
+      tx.abort?.();
+    } catch {
+      // A completed or already-aborted transaction cannot be aborted again.
+    }
+    try {
+      await done;
+    } catch {
+      // Preserve the original worker/queueing error for callers.
+    }
+    throw error;
+  }
 }

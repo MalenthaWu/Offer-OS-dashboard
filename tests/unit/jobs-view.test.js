@@ -32,6 +32,14 @@ function createBoard() {
   return board;
 }
 
+function createBoardAndTable() {
+  const board = createBoard();
+  const table = document.createElement('table');
+  table.innerHTML = '<thead><tr><th>公司 / 岗位</th><th>阶段</th><th>子阶段</th><th>批次</th><th>Base 地</th><th>投递链接</th><th>JD</th><th>投递日期</th><th>来源</th><th>收藏</th><th>更新</th></tr></thead><tbody id="job-table-body"></tbody>';
+  document.body.appendChild(table);
+  return { board, table };
+}
+
 describe('renderJobs', () => {
   beforeEach(() => {
     document.body.replaceChildren();
@@ -71,5 +79,26 @@ describe('renderJobs', () => {
     expect(stageControl.getAttribute('aria-label')).toBe(`更改${company} Product Intern的阶段`);
     expect(stageControl.value).toBe('已投递');
     expect([...stageControl.options].map(({ value }) => value)).toEqual(stages);
+  });
+
+  it('renders the persistent job set into the table with the same ids and safe text', () => {
+    const { table } = createBoardAndTable();
+    const company = '<img onerror=alert(1)>';
+
+    renderJobs(document, [{
+      id: 'job-table-1', company, position: 'Product Intern', base: '上海', batch: '日常实习',
+      priority: 'P1', stage: '已投递', createdAt: '2026-08-26T08:00:00.000Z', updatedAt: '2026-08-27T08:00:00.000Z', order: 0,
+    }]);
+
+    const row = table.querySelector('#job-table-body tr[data-id="job-table-1"]');
+    expect(row).not.toBeNull();
+    expect(row.dataset).toMatchObject({ id: 'job-table-1', company, position: 'Product Intern', stage: '已投递' });
+    expect(row.textContent).toContain(company);
+    expect(row.querySelector('img')).toBeNull();
+    expect(row.querySelector('[data-job-action="stage"]').value).toBe('已投递');
+    expect(row.querySelector('[data-job-action="detail"]')).not.toBeNull();
+    expect(row.querySelector('[data-job-action="delete"]')).not.toBeNull();
+    expect([...table.querySelectorAll('thead th')].at(-2).textContent).toBe('操作');
+    expect(row.lastElementChild.textContent).toBe('2026-08-27');
   });
 });

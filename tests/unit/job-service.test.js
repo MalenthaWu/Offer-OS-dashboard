@@ -4,6 +4,7 @@ import { openOfferOSDB } from '../../src/data/db.js';
 import { DB_NAME } from '../../src/data/schema.js';
 import { createAppStore } from '../../src/app/store.js';
 import { createActivityRepository } from '../../src/data/activity-repository.js';
+import { exportBackup, importBackup } from '../../src/data/backup.js';
 import { createJobRepository } from '../../src/data/job-repository.js';
 import { createJobService } from '../../src/domain/job-service.js';
 
@@ -123,5 +124,35 @@ describe('jobService', () => {
 
     expect(store.getState().jobs.filter((job) => job.stage === '关注').map((job) => job.id)).toEqual(['j2', 'j1']);
     expect(store.getState().activities).toHaveLength(2);
+  });
+
+  it('records exactly one follow-up that survives reload and a validated backup restore', async () => {
+    const db = await openTestDatabase();
+    const store = createAppStore();
+    const ids = vi.fn()
+      .mockReturnValueOnce('j1')
+      .mockReturnValueOnce('a-created')
+      .mockReturnValueOnce('a-follow-up');
+    const service = createJobService({
+      db,
+      store,
+      clock: () => new Date('2026-08-26T08:00:00.000Z'),
+      idFactory: ids,
+    });
+
+    await service.create({ company: 'OpenAI', position: 'Product Intern' });
+    await service.recordFollowUp('j1');
+
+    expect(store.getState().activities).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'a-follow-up', jobId: 'j1', type: '跟进' }),
+    ]));
+    expect(store.getState().activities.filter((activity) => activity.type === '跟进')).toHaveLength(1);
+
+    await service.reload();
+    expect(store.getState().activities.filter((activity) => activity.type === '跟进')).toHaveLength(1);
+
+    const backup = await exportBackup(db, new Date('2026-08-26T09:00:00.000Z'));
+    await importBackup(db, backup, { mode: 'replace', jobService: service });
+    expect(store.getState().activities.filter((activity) => activity.type === '跟进')).toHaveLength(1);
   });
 });

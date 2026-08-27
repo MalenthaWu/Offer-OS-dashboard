@@ -591,7 +591,25 @@ import { isSafeExternalLink, openExternalLink } from '../security/external-links
           if (option) $('#interview-job').value = option.value;
           dlg.close(); activateSection('interview'); showToast('已带入当前岗位，准备模拟');
         };
-        $('#detail-follow').onclick = () => { dlg.close(); showToast('已记录一次跟进'); };
+        const followButton = $('#detail-follow');
+        followButton.onclick = async () => {
+          const recordFollowUp = window.__OFFER_OS_RECORD_FOLLOW_UP__;
+          if (!card.dataset.id || typeof recordFollowUp !== 'function') {
+            showToast('记录跟进失败：本地存储尚未就绪');
+            return;
+          }
+          if (followButton.disabled) return;
+          followButton.disabled = true;
+          try {
+            await recordFollowUp(card.dataset.id);
+            dlg.close();
+            showToast('已记录一次跟进');
+          } catch (error) {
+            showToast(`记录跟进失败：${error instanceof Error ? error.message : '未知错误'}`);
+          } finally {
+            followButton.disabled = false;
+          }
+        };
         $('#detail-delete').onclick = () => { dlg.close(); window.__OFFER_OS_REMOVE_JOB__?.(card.dataset.id, `${company} ${position}`.trim()); };
         if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
       };

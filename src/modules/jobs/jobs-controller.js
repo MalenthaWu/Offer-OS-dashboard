@@ -34,6 +34,12 @@ function applyFilters(root) {
       && (batch === 'all' || card.dataset.batch === batch);
     card.style.display = visible ? '' : 'none';
   });
+  root.querySelectorAll('#job-table-body tr[data-job-search]').forEach((row) => {
+    const searchable = `${row.dataset.company || ''} ${row.dataset.position || ''}`.toLowerCase();
+    const visible = (!query || searchable.includes(query))
+      && (batch === 'all' || row.dataset.batch === batch);
+    row.style.display = visible ? '' : 'none';
+  });
 }
 
 function failureMessage(error) {
@@ -50,6 +56,7 @@ function beforeJobId(column, jobId, clientY) {
 export function initJobsController({ root, store, service, showToast, onFilter = () => {} }) {
   root.__OFFER_OS_JOBS_CLEANUP__?.();
   const board = root.querySelector('#kanban-board');
+  const tableBody = root.querySelector('#job-table-body');
   const form = root.querySelector('#add-job-form');
   const search = root.querySelector('#job-search');
   const batchFilter = root.querySelector('#batch-filter');
@@ -92,33 +99,37 @@ export function initJobsController({ root, store, service, showToast, onFilter =
     }
   };
 
-  const onBoardClick = async (event) => {
+  const onJobActionClick = async (event, container) => {
     const action = event.target.closest('[data-job-action]');
-    if (!action || !board?.contains(action)) return;
+    if (!action || !container?.contains(action)) return;
     const card = action.closest('.job-card');
-    if (!card?.dataset.id) return;
+    const row = action.closest('tr[data-id]');
+    const item = card ?? row;
+    if (!item?.dataset.id) return;
 
     if (action.dataset.jobAction === 'detail') {
-      root.defaultView?.__OFFER_OS_OPEN_JOB_DETAIL__?.(card);
+      root.defaultView?.__OFFER_OS_OPEN_JOB_DETAIL__?.(item);
       return;
     }
     if (action.dataset.jobAction !== 'delete') return;
 
-    const name = `${card.dataset.company || ''} ${card.dataset.position || ''}`.trim();
-    await removeJob(card.dataset.id, name);
+    const name = `${item.dataset.company || ''} ${item.dataset.position || ''}`.trim();
+    await removeJob(item.dataset.id, name);
   };
 
-  const onBoardChange = async (event) => {
+  const onJobStageChange = async (event, container) => {
     const control = event.target.closest('[data-job-action="stage"]');
-    if (!control || !board?.contains(control)) return;
+    if (!control || !container?.contains(control)) return;
     const card = control.closest('.job-card');
+    const row = control.closest('tr[data-id]');
+    const item = card ?? row;
     const stage = control.value;
-    if (!card?.dataset.id || !stage || stage === card.dataset.stage) return;
+    if (!item?.dataset.id || !stage || stage === item.dataset.stage) return;
 
     try {
-      await service.move(card.dataset.id, stage, null);
+      await service.move(item.dataset.id, stage, null);
     } catch (error) {
-      control.value = card.dataset.stage;
+      control.value = item.dataset.stage;
       onFailure(error);
     }
   };
@@ -161,8 +172,14 @@ export function initJobsController({ root, store, service, showToast, onFilter =
   };
 
   form?.addEventListener('submit', onSubmit);
+  const onBoardClick = (event) => onJobActionClick(event, board);
+  const onTableClick = (event) => onJobActionClick(event, tableBody);
+  const onBoardChange = (event) => onJobStageChange(event, board);
+  const onTableChange = (event) => onJobStageChange(event, tableBody);
   board?.addEventListener('click', onBoardClick);
+  tableBody?.addEventListener('click', onTableClick);
   board?.addEventListener('change', onBoardChange);
+  tableBody?.addEventListener('change', onTableChange);
   board?.addEventListener('dragstart', onDragStart);
   board?.addEventListener('dragend', onDragEnd);
   board?.addEventListener('dragover', onDragOver);
@@ -171,6 +188,7 @@ export function initJobsController({ root, store, service, showToast, onFilter =
   batchFilter?.addEventListener('change', onBatchChange);
   if (root.defaultView) {
     root.defaultView.__OFFER_OS_REMOVE_JOB__ = (id, name) => removeJob(id, name);
+    root.defaultView.__OFFER_OS_RECORD_FOLLOW_UP__ = (id) => service.recordFollowUp(id);
   }
   const unsubscribe = store.subscribe('jobs:changed', render);
   render();
@@ -178,7 +196,9 @@ export function initJobsController({ root, store, service, showToast, onFilter =
   const cleanup = () => {
     form?.removeEventListener('submit', onSubmit);
     board?.removeEventListener('click', onBoardClick);
+    tableBody?.removeEventListener('click', onTableClick);
     board?.removeEventListener('change', onBoardChange);
+    tableBody?.removeEventListener('change', onTableChange);
     board?.removeEventListener('dragstart', onDragStart);
     board?.removeEventListener('dragend', onDragEnd);
     board?.removeEventListener('dragover', onDragOver);
@@ -187,6 +207,7 @@ export function initJobsController({ root, store, service, showToast, onFilter =
     batchFilter?.removeEventListener('change', onBatchChange);
     unsubscribe();
     if (root.defaultView?.__OFFER_OS_REMOVE_JOB__) delete root.defaultView.__OFFER_OS_REMOVE_JOB__;
+    if (root.defaultView?.__OFFER_OS_RECORD_FOLLOW_UP__) delete root.defaultView.__OFFER_OS_RECORD_FOLLOW_UP__;
     if (root.__OFFER_OS_JOBS_CLEANUP__ === cleanup) delete root.__OFFER_OS_JOBS_CLEANUP__;
   };
   root.__OFFER_OS_JOBS_CLEANUP__ = cleanup;

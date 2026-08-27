@@ -41,6 +41,92 @@ function jobSource(job) {
   return '手动';
 }
 
+function sortedJobs(jobs) {
+  return jobs.slice().sort((left, right) => {
+    const leftOrder = Number.isFinite(left.order) ? left.order : Number.MAX_SAFE_INTEGER;
+    const rightOrder = Number.isFinite(right.order) ? right.order : Number.MAX_SAFE_INTEGER;
+    return leftOrder - rightOrder || String(left.createdAt || '').localeCompare(String(right.createdAt || '')) || String(left.id).localeCompare(String(right.id));
+  });
+}
+
+function createStageControl(job) {
+  const stage = asText(job.stage || '关注');
+  const stageControl = createElement('select', 'select-input mini-action');
+  stageControl.dataset.jobAction = 'stage';
+  stageControl.setAttribute('aria-label', `更改${asText(job.company)} ${asText(job.position)}的阶段`.trim());
+  JOB_STAGES.forEach((value) => {
+    const option = createElement('option', '', value);
+    option.value = value;
+    option.selected = value === stage;
+    stageControl.appendChild(option);
+  });
+  return stageControl;
+}
+
+function createTableCell(content, className) {
+  const cell = createElement('td', className);
+  if (content) cell.append(content);
+  return cell;
+}
+
+function createJobTableRow(job) {
+  const stage = asText(job.stage || '关注');
+  const row = document.createElement('tr');
+  row.dataset.jobSearch = '';
+  row.dataset.id = asText(job.id);
+  row.dataset.company = asText(job.company);
+  row.dataset.position = asText(job.position);
+  row.dataset.batch = asText(job.batch);
+  row.dataset.base = asText(job.base);
+  row.dataset.stage = stage;
+  row.dataset.applyLink = asText(job.applyLink ?? job.apply_link);
+  row.dataset.jdRaw = asText(job.jdRaw ?? job.jd);
+  row.dataset.jdFormatted = asText(job.jdFormatted);
+
+  const company = createElement('div', 'company-cell');
+  company.append(
+    createElement('span', 'company-logo', asText(job.company).slice(0, 2).toUpperCase() || '?'),
+    (() => {
+      const titles = createElement('div');
+      titles.append(createElement('strong', '', job.company), createElement('span', '', job.position));
+      return titles;
+    })(),
+  );
+  const details = createElement('button', 'link-button', '查看详情');
+  details.type = 'button';
+  details.dataset.jobAction = 'detail';
+  const remove = createElement('button', 'table-job-delete', '删除');
+  remove.type = 'button';
+  remove.dataset.jobAction = 'delete';
+  remove.setAttribute('aria-label', `删除${asText(job.company)} ${asText(job.position)}`.trim());
+  const actions = createElement('div', 'table-job-actions');
+  actions.append(details, remove);
+
+  row.append(
+    createTableCell(company),
+    createTableCell(createStageControl(job)),
+    createTableCell(createElement('span', '', '—')),
+    createTableCell(createElement('span', '', job.batch || '—')),
+    createTableCell(createElement('span', '', job.base || '—')),
+    createTableCell(createElement('span', '', job.applyLink ?? job.apply_link ? '已保存链接' : '—')),
+    createTableCell(createElement('span', '', job.jdFormatted || job.jdRaw || job.jd ? '已保存' : '—')),
+    createTableCell(createElement('span', '', job.createdAt?.slice(0, 10) || '—'), 'mono'),
+    createTableCell(createElement('span', '', jobSource(job)), 'mono'),
+    createTableCell(actions, 'mono'),
+    createTableCell(createElement('span', '', job.updatedAt?.slice(0, 10) || '—'), 'mono'),
+  );
+  return row;
+}
+
+function renderJobTable(root, jobs) {
+  const body = root.querySelector?.('#job-table-body');
+  if (!body) return;
+  const table = body.closest('table');
+  const favoriteHeader = [...(table?.querySelectorAll('thead th') ?? [])].find((header) => header.textContent.trim() === '收藏');
+  if (favoriteHeader) favoriteHeader.textContent = '操作';
+  body.replaceChildren(...sortedJobs(jobs).map(createJobTableRow));
+}
+
 export function createJobCard(job) {
   const card = document.createElement('article');
   const stage = asText(job.stage || '关注');
@@ -94,15 +180,7 @@ export function createJobCard(job) {
   meta.append(saved, source, remove);
 
   const actions = createElement('div', 'job-actions');
-  const stageControl = createElement('select', 'select-input mini-action');
-  stageControl.dataset.jobAction = 'stage';
-  stageControl.setAttribute('aria-label', `更改${asText(job.company)} ${asText(job.position)}的阶段`.trim());
-  JOB_STAGES.forEach((value) => {
-    const option = createElement('option', '', value);
-    option.value = value;
-    option.selected = value === stage;
-    stageControl.appendChild(option);
-  });
+  const stageControl = createStageControl(job);
   const detail = createElement('button', 'mini-action', '查看详情');
   detail.type = 'button';
   detail.dataset.jobAction = 'detail';
@@ -121,11 +199,7 @@ export function renderJobs(root, jobs) {
     column.querySelectorAll(':scope > .job-card').forEach((card) => card.remove());
   });
 
-  jobs.slice().sort((left, right) => {
-    const leftOrder = Number.isFinite(left.order) ? left.order : Number.MAX_SAFE_INTEGER;
-    const rightOrder = Number.isFinite(right.order) ? right.order : Number.MAX_SAFE_INTEGER;
-    return leftOrder - rightOrder || String(left.createdAt || '').localeCompare(String(right.createdAt || '')) || String(left.id).localeCompare(String(right.id));
-  }).forEach((job) => {
+  sortedJobs(jobs).forEach((job) => {
     const column = columns.find((candidate) => candidate.dataset.stage === (job.stage || '关注'));
     if (!column) return;
     column.insertBefore(createJobCard(job), column.querySelector(':scope > .add-card'));
@@ -135,4 +209,5 @@ export function renderJobs(root, jobs) {
     const count = column.querySelector('.col-count');
     if (count) count.textContent = String(column.querySelectorAll(':scope > .job-card').length);
   });
+  renderJobTable(root, jobs);
 }

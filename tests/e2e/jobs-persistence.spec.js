@@ -44,6 +44,37 @@ async function addJob(page, company, position) {
   return card.getAttribute('data-id');
 }
 
+async function activitiesForJob(page, jobId) {
+  return page.evaluate(async (id) => {
+    const db = window.__OFFER_OS_DB__;
+    const request = db.transaction('activities').objectStore('activities').getAll();
+    const activities = await new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    return activities.filter((activity) => activity.jobId === id);
+  }, jobId);
+}
+
+function importPayload() {
+  return {
+    app: 'offer-os',
+    schemaVersion: 1,
+    exportedAt: '2026-08-26T09:00:00.000Z',
+    stores: {
+      jobs: [{
+        id: 'imported-table-job', company: 'Imported Co', position: 'Imported PM', stage: '关注',
+        batch: '日常实习', base: '上海', createdAt: '2026-08-26T08:00:00.000Z',
+        updatedAt: '2026-08-26T08:00:00.000Z', schemaVersion: 1, order: 0,
+      }],
+      activities: [{
+        id: 'imported-table-activity', jobId: 'imported-table-job', type: '关注',
+        occurredAt: '2026-08-26T08:00:00.000Z', schemaVersion: 1,
+      }],
+    },
+  };
+}
+
 test('keeps created jobs and stage changes after reload', async ({ page }, testInfo) => {
   await completeDemoLogin(page);
   await navigateTo(page, 'jobs');
@@ -80,4 +111,46 @@ test('keeps created jobs and stage changes after reload', async ({ page }, testI
   await expect(page.locator('.kanban-col[data-stage="已投递"] .job-card', { hasText: 'OpenAI' })).toBeVisible();
   const orderedIds = await page.locator('.kanban-col[data-stage="已投递"] .job-card').evaluateAll((cards) => cards.map((card) => card.dataset.id));
   expect(orderedIds.indexOf(openAiId)).toBeLessThan(orderedIds.indexOf(anthropicId));
+});
+
+test('uses the persistent job set for table import, detail follow-up, delete, and reload', async ({ page }) => {
+  await completeDemoLogin(page);
+  await navigateTo(page, 'jobs');
+  const createdId = await addJob(page, 'Table Created Co', 'Created PM');
+
+  await page.getByRole('tab', { name: '表格' }).click();
+  await expect(page.locator(`#job-table-body tr[data-id="${createdId}"]`)).toBeVisible();
+
+  await page.locator('#profile-settings').click();
+  await expect(page.locator('#settings-dialog')).toBeVisible();
+  page.once('dialog', (dialog) => dialog.accept('merge'));
+  await page.locator('#local-data-file').setInputFiles({
+    name: 'offer-os-import.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(importPayload())),
+  });
+  await expect(page.locator('#job-table-body tr[data-id="imported-table-job"]')).toBeVisible();
+
+  await page.reload();
+  await navigateTo(page, 'jobs');
+  await page.getByRole('tab', { name: '表格' }).click();
+  const imported = page.locator('#job-table-body tr[data-id="imported-table-job"]');
+  await expect(imported).toBeVisible();
+  await imported.locator('[data-job-action="detail"]').click();
+  await expect(page.locator('#job-detail-dialog')).toBeVisible();
+  await page.locator('#detail-follow').click();
+  await expect(page.locator('#job-detail-dialog')).toBeHidden();
+  await expect.poll(() => activitiesForJob(page, 'imported-table-job')).toEqual(expect.arrayContaining([
+    expect.objectContaining({ type: '跟进', jobId: 'imported-table-job' }),
+  ]));
+  expect((await activitiesForJob(page, 'imported-table-job')).filter((activity) => activity.type === '跟进')).toHaveLength(1);
+
+  page.once('dialog', (dialog) => dialog.accept());
+  await imported.locator('[data-job-action="delete"]').click();
+  await expect(imported).toHaveCount(0);
+  await page.reload();
+  await navigateTo(page, 'jobs');
+  await page.getByRole('tab', { name: '表格' }).click();
+  await expect(page.locator('#job-table-body tr[data-id="imported-table-job"]')).toHaveCount(0);
+  await expect(page.locator(`#job-table-body tr[data-id="${createdId}"]`)).toBeVisible();
 });

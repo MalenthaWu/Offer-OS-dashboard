@@ -7,7 +7,8 @@ function createRoot() {
   document.body.innerHTML = `
     <form id="add-job-form"><input name="company" value="OpenAI"><input name="position" value="Product Intern"><input name="batch" value="日常实习"><button type="submit">保存</button></form>
     <input id="job-search"><select id="batch-filter"><option value="all">全部</option><option value="日常实习">日常实习</option></select>
-    <div id="kanban-board"><section class="kanban-col" data-stage="关注"><span class="col-count"></span><button class="add-card"></button></section><section class="kanban-col" data-stage="已投递"><span class="col-count"></span><button class="add-card"></button></section></div>`;
+    <div id="kanban-board"><section class="kanban-col" data-stage="关注"><span class="col-count"></span><button class="add-card"></button></section><section class="kanban-col" data-stage="已投递"><span class="col-count"></span><button class="add-card"></button></section></div>
+    <table><tbody id="job-table-body"></tbody></table>`;
   return document;
 }
 
@@ -108,5 +109,26 @@ describe('initJobsController', () => {
 
     expect(detail).toHaveBeenCalledOnce();
     await vi.waitFor(() => expect(service.remove).toHaveBeenCalledWith('job-1'));
+  });
+
+  it('routes table stage, detail, and delete actions through the persistent service', async () => {
+    const root = createRoot();
+    const store = createAppStore({ jobs: [{ id: 'job-1', company: 'OpenAI', position: 'Product Intern', batch: '日常实习', stage: '关注' }] });
+    const detail = vi.fn();
+    const service = { create: vi.fn(), move: vi.fn().mockResolvedValue(undefined), remove: vi.fn().mockResolvedValue(undefined) };
+    root.defaultView.__OFFER_OS_OPEN_JOB_DETAIL__ = detail;
+    root.defaultView.confirm = vi.fn(() => true);
+
+    initJobsController({ root, store, service, showToast: vi.fn() });
+    const row = root.querySelector('#job-table-body tr[data-id="job-1"]');
+    const stage = row.querySelector('[data-job-action="stage"]');
+    stage.value = '已投递';
+    stage.dispatchEvent(new Event('change', { bubbles: true }));
+    row.querySelector('[data-job-action="detail"]').click();
+    row.querySelector('[data-job-action="delete"]').click();
+
+    await vi.waitFor(() => expect(service.move).toHaveBeenCalledWith('job-1', '已投递', null));
+    await vi.waitFor(() => expect(service.remove).toHaveBeenCalledWith('job-1'));
+    expect(detail).toHaveBeenCalledWith(expect.objectContaining({ dataset: expect.objectContaining({ id: 'job-1' }) }));
   });
 });

@@ -150,5 +150,24 @@ export function createJobService({ db, store, clock = () => new Date(), idFactor
     await reload();
   }
 
-  return { create, update, changeStage, move, remove, reload };
+  async function recordFollowUp(id) {
+    const occurredAt = toISO(clock);
+    const activity = {
+      id: idFactory(),
+      jobId: id,
+      type: '跟进',
+      occurredAt,
+      schemaVersion: SCHEMA_VERSION,
+    };
+
+    await runTransaction(db, ['jobs', 'activities'], 'readwrite', async (tx) => {
+      const job = await requestToPromise(tx.objectStore('jobs').get(id));
+      if (!job) throw new Error(`Job not found: ${id}`);
+      tx.objectStore('activities').put(activity);
+    });
+    await reload();
+    return activity;
+  }
+
+  return { create, update, changeStage, move, remove, recordFollowUp, reload };
 }

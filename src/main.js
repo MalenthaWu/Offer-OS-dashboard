@@ -7,6 +7,7 @@ import { createJobService } from './domain/job-service.js';
 import { startLegacyWithDashboard } from './modules/dashboard/dashboard-startup.js';
 import { initDashboardView } from './modules/dashboard/dashboard-view.js';
 import { initJobsController } from './modules/jobs/jobs-controller.js';
+import { initLocalDataControls } from './modules/settings/local-data-controls.js';
 
 window.__OFFER_OS_FEATURES__ = {
   jobs: false,
@@ -43,6 +44,12 @@ await bootstrapOfferOS({
 
     const service = createJobService({ db: window.__OFFER_OS_DB__, store });
     initJobsController({ root: document, store, service, showToast });
+    window.__OFFER_OS_FEATURES__.backup = initLocalDataControls({
+      root: document,
+      db: window.__OFFER_OS_DB__,
+      jobService: service,
+      showToast,
+    });
     try {
       await service.reload();
     } catch (error) {

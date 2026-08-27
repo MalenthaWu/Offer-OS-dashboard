@@ -114,7 +114,7 @@ import { isSafeExternalLink, openExternalLink } from '../security/external-links
         showToast('已整理格式，内容未删改');
       });
 
-      if (!window.__OFFER_OS_FEATURES__?.jobs) {
+      if (window.__OFFER_OS_FEATURES__?.legacyJobMutations) {
       $('#add-job-form').addEventListener('submit', (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -200,7 +200,7 @@ import { isSafeExternalLink, openExternalLink } from '../security/external-links
       $('#batch-filter').addEventListener('change', filterJobs);
       $('#more-filter').addEventListener('click', () => showToast('当前演示支持关键词与批次筛选'));
 
-      if (!window.__OFFER_OS_FEATURES__?.jobs) {
+      if (window.__OFFER_OS_FEATURES__?.legacyJobMutations) {
       // ---- 看板卡片精简：移除收藏/底部按钮、状态徽标移至右上角、加删除 ----
       const STATUS_RE = /(笔试|测评|一面|二面|三面|HR\s*面|终面|AI\s*面|Offer|流程结束|已归档|拒信|放弃)/;
       const STAGE_CLASS = { '关注': 'badge-gray', '已投递': 'badge-blue', '已测评': 'badge-butter', '面试中': 'badge-lilac', '已结束': 'badge-mint' };

@@ -6,6 +6,10 @@ const BACKUP_STORES = Object.freeze(['jobs', 'activities']);
 const JOB_STAGES = new Set(['关注', '已投递', '已测评', '面试中', '已结束']);
 const ACTIVITY_TYPES = new Set(['关注', '投递', '测评', '面试', '流程结束']);
 const JOB_STRING_FIELDS = ['base', 'batch', 'priority', 'email', 'applyLink', 'apply_link', 'referral', 'referral_code', 'other', 'jdRaw', 'jdFormatted', 'jd'];
+const JOB_FIELDS = new Set(['id', 'company', 'position', 'stage', 'favorite', 'createdAt', 'updatedAt', 'schemaVersion', 'order', ...JOB_STRING_FIELDS]);
+const ACTIVITY_FIELDS = new Set(['id', 'jobId', 'formerJobId', 'type', 'occurredAt', 'schemaVersion']);
+const ENVELOPE_FIELDS = new Set(['app', 'schemaVersion', 'exportedAt', 'stores']);
+const STORES_FIELDS = new Set(['jobs', 'activities']);
 const DISALLOWED_RECORD_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?(?:Z|[+-]\d{2}:\d{2})$/;
 
@@ -26,6 +30,30 @@ function isPlainDataRecord(record) {
   }
 }
 
+function hasOnlyOwnKeys(record, allowed) {
+  return isPlainDataRecord(record) && Object.getOwnPropertyNames(record).every((key) => allowed.has(key));
+}
+
+function hasUnsafeNestedValue(value, seen = new Set()) {
+  if (!value || typeof value !== 'object') return false;
+  try {
+    if (seen.has(value)) return false;
+    seen.add(value);
+    if (!Array.isArray(value) && Object.getPrototypeOf(value) !== Object.prototype) return true;
+    if (Object.getOwnPropertySymbols(value).length > 0) return true;
+    const keys = Array.isArray(value) ? Object.keys(value) : Object.getOwnPropertyNames(value);
+    return keys.some((key) => {
+      const descriptor = Object.getOwnPropertyDescriptor(value, key);
+      return DISALLOWED_RECORD_KEYS.has(key)
+        || !descriptor?.enumerable
+        || !Object.hasOwn(descriptor, 'value')
+        || hasUnsafeNestedValue(descriptor.value, seen);
+    });
+  } catch {
+    return true;
+  }
+}
+
 function hasString(record, field) {
   return Object.hasOwn(record, field) && typeof record[field] === 'string';
 }
@@ -35,7 +63,7 @@ function hasValidId(record) {
 }
 
 function validJob(record) {
-  if (!isPlainDataRecord(record) || !hasValidId(record)) return false;
+  if (!hasOnlyOwnKeys(record, JOB_FIELDS) || !hasValidId(record)) return false;
   if (!hasString(record, 'company') || !hasString(record, 'position') || !JOB_STAGES.has(record.stage)) return false;
   if (record.schemaVersion !== SCHEMA_VERSION || !isValidISO(record.createdAt) || !isValidISO(record.updatedAt)) return false;
   if (Object.hasOwn(record, 'order') && !Number.isFinite(record.order)) return false;
@@ -44,7 +72,7 @@ function validJob(record) {
 }
 
 function validActivity(record) {
-  if (!isPlainDataRecord(record) || !hasValidId(record)) return false;
+  if (!hasOnlyOwnKeys(record, ACTIVITY_FIELDS) || !hasValidId(record)) return false;
   if (record.schemaVersion !== SCHEMA_VERSION || !ACTIVITY_TYPES.has(record.type) || !isValidISO(record.occurredAt)) return false;
   if (!(typeof record.jobId === 'string' || record.jobId === null)) return false;
   return !Object.hasOwn(record, 'formerJobId') || typeof record.formerJobId === 'string';
@@ -60,12 +88,14 @@ function validateStore(records, validator) {
 }
 
 function validateBackup(payload) {
+  if (!hasOnlyOwnKeys(payload, ENVELOPE_FIELDS)) throw new Error('备份内容不完整');
   if (payload?.app !== APP) throw new Error('不是 Offer OS 备份文件');
   if (payload?.schemaVersion !== SCHEMA_VERSION) throw new Error('备份版本不受支持');
-  if (!Array.isArray(payload?.stores?.jobs) || !Array.isArray(payload?.stores?.activities)) {
+  if (!isValidISO(payload.exportedAt) || !hasOnlyOwnKeys(payload.stores, STORES_FIELDS)
+    || !Array.isArray(payload.stores.jobs) || !Array.isArray(payload.stores.activities)) {
     throw new Error('备份内容不完整');
   }
-  if (!validateStore(payload.stores.jobs, validJob) || !validateStore(payload.stores.activities, validActivity)) {
+  if (hasUnsafeNestedValue(payload) || !validateStore(payload.stores.jobs, validJob) || !validateStore(payload.stores.activities, validActivity)) {
     throw new Error('备份内容不完整');
   }
   try {

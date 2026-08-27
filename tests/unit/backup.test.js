@@ -227,6 +227,12 @@ describe('local JSON backup', () => {
     ['uncloneable extra values', () => validPayload({ stores: {
       jobs: [validJob({ unsupported: () => {} })], activities: [validActivity()],
     } })],
+    ['an envelope without a valid export timestamp', () => JSON.parse(JSON.stringify(validPayload({ exportedAt: null })))],
+    ['nested JSON prototype keys in unknown job fields', () => {
+      const payload = JSON.parse(JSON.stringify(validPayload()));
+      payload.stores.jobs[0].metadata = JSON.parse('{"__proto__":"unsafe"}');
+      return payload;
+    }],
   ])('rejects %s before writing or reloading', async (_name, makePayload) => {
     const db = await openTestDatabase();
     await seed(db, { jobs: [validJob({ id: 'existing-job' })], activities: [validActivity({ id: 'existing-activity', jobId: null })] });

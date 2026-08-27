@@ -11,6 +11,15 @@ async function completeDemoLogin(page) {
   await expect(page.locator('#login-gate')).toBeHidden();
 }
 
+async function navigateTo(page, section) {
+  const menuButton = page.locator('#mobile-menu');
+  if (await menuButton.isVisible()) {
+    await menuButton.click();
+    await expect(page.locator('#sidebar')).toHaveClass(/open/);
+  }
+  await page.locator(`.nav-item[data-section="${section}"]`).click();
+}
+
 async function addJob(page, company, position) {
   await page.getByRole('button', { name: '添加岗位' }).first().click();
   await page.locator('#new-company').fill(company);
@@ -43,12 +52,12 @@ test('persists a newly submitted application in the dashboard total and today he
   const beforeTotal = Number(await total.textContent());
   const beforeToday = Number(await todayCell.getAttribute('data-count'));
 
-  await page.locator('.nav-item[data-section="jobs"]').click();
+  await navigateTo(page, 'jobs');
   const jobId = await addJob(page, 'Dashboard Sync', 'Product Intern');
   await moveToSubmitted(page, jobId);
   await expect(page.locator('.kanban-col[data-stage="已投递"] .job-card', { hasText: 'Dashboard Sync' })).toBeVisible();
 
-  await page.locator('.nav-item[data-section="dashboard"]').click();
+  await navigateTo(page, 'dashboard');
   await expect(total).toHaveText(String(beforeTotal + 1));
   await expect(todayCell).toHaveAttribute('data-count', String(beforeToday + 1));
 

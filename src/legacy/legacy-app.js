@@ -932,7 +932,7 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
       const hasKw = (text, kw) => /[一-龥]/.test(kw) ? text.includes(kw) : new RegExp('\\b' + kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(text);
       const bulletTags = (text) => { const out = []; for (const [tag, kws] of Object.entries(CAP_TAGS)) if (kws.some(kw => hasKw(text, kw))) out.push(tag); return out; };
       const fallbackJD = (company, position) => {
-        const p = position.toLowerCase(); const tags = [];
+        const p = position.toLowerCase(); let tags = [];
         if (p.includes('增长')) tags.push('用户增长', '转化漏斗', '用户分层', '生命周期运营', 'A/B Test', '渠道归因');
         if (p.includes('ai')) tags.push('大模型', 'RAG', 'Prompt', '模型评测', '用户研究');
         if (p.includes('策略')) tags.push('策略', 'A/B Test', '数据建模');

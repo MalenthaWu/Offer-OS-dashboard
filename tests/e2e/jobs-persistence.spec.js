@@ -12,6 +12,15 @@ async function completeDemoLogin(page) {
   await expect(page.locator('#login-gate')).toBeHidden();
 }
 
+async function navigateTo(page, section) {
+  const menuButton = page.locator('#mobile-menu');
+  if (await menuButton.isVisible()) {
+    await menuButton.click();
+    await expect(page.locator('#sidebar')).toHaveClass(/open/);
+  }
+  await page.locator(`.nav-item[data-section="${section}"]`).click();
+}
+
 async function dragJobToStage(page, jobId, stage, beforeId = null) {
   const source = page.locator(`.job-card[data-id="${jobId}"]`);
   const column = page.locator(`.kanban-col[data-stage="${stage}"]`);
@@ -37,7 +46,7 @@ async function addJob(page, company, position) {
 
 test('keeps created jobs and stage changes after reload', async ({ page }) => {
   await completeDemoLogin(page);
-  await page.locator('.nav-item[data-section="jobs"]').click();
+  await navigateTo(page, 'jobs');
   const openAiId = await addJob(page, 'OpenAI', 'Product Intern');
   const anthropicId = await addJob(page, 'Anthropic', 'Research Intern');
 
@@ -45,7 +54,7 @@ test('keeps created jobs and stage changes after reload', async ({ page }) => {
   await expect(card).toBeVisible();
 
   await page.reload();
-  await page.locator('.nav-item[data-section="jobs"]').click();
+  await navigateTo(page, 'jobs');
   await expect(page.locator('.kanban-col[data-stage="关注"] .job-card', { hasText: 'OpenAI' })).toBeVisible();
 
   await expect(card).toHaveCount(1);
@@ -62,7 +71,7 @@ test('keeps created jobs and stage changes after reload', async ({ page }) => {
   await page.locator('#job-search').fill('');
 
   await page.reload();
-  await page.locator('.nav-item[data-section="jobs"]').click();
+  await navigateTo(page, 'jobs');
   await expect(page.locator('.kanban-col[data-stage="已投递"] .job-card', { hasText: 'OpenAI' })).toBeVisible();
   const orderedIds = await page.locator('.kanban-col[data-stage="已投递"] .job-card').evaluateAll((cards) => cards.map((card) => card.dataset.id));
   expect(orderedIds.indexOf(openAiId)).toBeLessThan(orderedIds.indexOf(anthropicId));

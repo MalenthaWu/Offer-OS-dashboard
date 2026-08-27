@@ -12,6 +12,8 @@ const PRIORITY_CLASS = Object.freeze({
   P2: 'badge-pri-2',
 });
 
+const JOB_STAGES = Object.freeze(['关注', '已投递', '已测评', '面试中', '已结束']);
+
 const asText = (value) => value == null ? '' : String(value);
 
 function createElement(tag, className, value) {
@@ -92,10 +94,19 @@ export function createJobCard(job) {
   meta.append(saved, source, remove);
 
   const actions = createElement('div', 'job-actions');
+  const stageControl = createElement('select', 'select-input mini-action');
+  stageControl.dataset.jobAction = 'stage';
+  stageControl.setAttribute('aria-label', `更改${asText(job.company)} ${asText(job.position)}的阶段`.trim());
+  JOB_STAGES.forEach((value) => {
+    const option = createElement('option', '', value);
+    option.value = value;
+    option.selected = value === stage;
+    stageControl.appendChild(option);
+  });
   const detail = createElement('button', 'mini-action', '查看详情');
   detail.type = 'button';
   detail.dataset.jobAction = 'detail';
-  actions.appendChild(detail);
+  actions.append(stageControl, detail);
 
   card.append(top, tags, meta, actions);
   return card;

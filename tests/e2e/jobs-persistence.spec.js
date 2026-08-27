@@ -44,7 +44,7 @@ async function addJob(page, company, position) {
   return card.getAttribute('data-id');
 }
 
-test('keeps created jobs and stage changes after reload', async ({ page }) => {
+test('keeps created jobs and stage changes after reload', async ({ page }, testInfo) => {
   await completeDemoLogin(page);
   await navigateTo(page, 'jobs');
   const openAiId = await addJob(page, 'OpenAI', 'Product Intern');
@@ -58,9 +58,14 @@ test('keeps created jobs and stage changes after reload', async ({ page }) => {
   await expect(page.locator('.kanban-col[data-stage="关注"] .job-card', { hasText: 'OpenAI' })).toBeVisible();
 
   await expect(card).toHaveCount(1);
-  await dragJobToStage(page, openAiId, '已投递');
-  await dragJobToStage(page, anthropicId, '已投递');
-  await dragJobToStage(page, openAiId, '已投递', anthropicId);
+  if (testInfo.project.name === 'chromium-mobile-390') {
+    await page.locator(`.job-card[data-id="${openAiId}"] [data-job-action="stage"]`).selectOption('已投递');
+    await page.locator(`.job-card[data-id="${anthropicId}"] [data-job-action="stage"]`).selectOption('已投递');
+  } else {
+    await dragJobToStage(page, openAiId, '已投递');
+    await dragJobToStage(page, anthropicId, '已投递');
+    await dragJobToStage(page, openAiId, '已投递', anthropicId);
+  }
   await expect(page.locator('.kanban-col[data-stage="已投递"] .job-card', { hasText: 'OpenAI' })).toBeVisible();
 
   await page.getByRole('tab', { name: '表格' }).click();

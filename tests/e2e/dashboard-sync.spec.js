@@ -30,13 +30,9 @@ async function addJob(page, company, position) {
 }
 
 async function moveToSubmitted(page, jobId) {
-  const source = page.locator(`.job-card[data-id="${jobId}"]`);
-  const target = page.locator('.kanban-col[data-stage="已投递"]');
-  const dataTransfer = await page.evaluateHandle(() => new DataTransfer());
-  await source.dispatchEvent('dragstart', { dataTransfer });
-  await target.dispatchEvent('dragover', { dataTransfer });
-  await target.dispatchEvent('drop', { dataTransfer });
-  await source.dispatchEvent('dragend', { dataTransfer });
+  const stageControl = page.locator(`.job-card[data-id="${jobId}"] [data-job-action="stage"]`);
+  await expect(stageControl).toHaveAttribute('aria-label', /\u66f4改.+\u7684阶段/);
+  await stageControl.selectOption('已投递');
 }
 
 function localDateKey() {

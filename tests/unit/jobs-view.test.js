@@ -65,5 +65,11 @@ describe('renderJobs', () => {
       .toEqual(['0', '1', '0', '0', '0']);
     expect([...board.querySelectorAll('.add-card')].map((button) => button.textContent))
       .toEqual(stages.map((stage) => `添加到${stage}`));
+
+    const stageControl = card.querySelector('[data-job-action="stage"]');
+    expect(stageControl).toBeInstanceOf(HTMLSelectElement);
+    expect(stageControl.getAttribute('aria-label')).toBe(`更改${company} Product Intern的阶段`);
+    expect(stageControl.value).toBe('已投递');
+    expect([...stageControl.options].map(({ value }) => value)).toEqual(stages);
   });
 });

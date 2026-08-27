@@ -103,6 +103,21 @@ export function initJobsController({ root, store, service, showToast, onFilter =
     await removeJob(card.dataset.id, name);
   };
 
+  const onBoardChange = async (event) => {
+    const control = event.target.closest('[data-job-action="stage"]');
+    if (!control || !board?.contains(control)) return;
+    const card = control.closest('.job-card');
+    const stage = control.value;
+    if (!card?.dataset.id || !stage || stage === card.dataset.stage) return;
+
+    try {
+      await service.move(card.dataset.id, stage, null);
+    } catch (error) {
+      control.value = card.dataset.stage;
+      onFailure(error);
+    }
+  };
+
   const onDragStart = (event) => {
     const card = event.target.closest('.job-card');
     if (!card || !board?.contains(card)) return;
@@ -142,6 +157,7 @@ export function initJobsController({ root, store, service, showToast, onFilter =
 
   form?.addEventListener('submit', onSubmit);
   board?.addEventListener('click', onBoardClick);
+  board?.addEventListener('change', onBoardChange);
   board?.addEventListener('dragstart', onDragStart);
   board?.addEventListener('dragend', onDragEnd);
   board?.addEventListener('dragover', onDragOver);
@@ -157,6 +173,7 @@ export function initJobsController({ root, store, service, showToast, onFilter =
   const cleanup = () => {
     form?.removeEventListener('submit', onSubmit);
     board?.removeEventListener('click', onBoardClick);
+    board?.removeEventListener('change', onBoardChange);
     board?.removeEventListener('dragstart', onDragStart);
     board?.removeEventListener('dragend', onDragEnd);
     board?.removeEventListener('dragover', onDragOver);

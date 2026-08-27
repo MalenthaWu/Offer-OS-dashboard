@@ -79,6 +79,21 @@ describe('initJobsController', () => {
     await vi.waitFor(() => expect(service.move).toHaveBeenCalledWith('job-a', '关注', 'job-b'));
   });
 
+  it('moves a job when its accessible stage control changes', async () => {
+    const root = createRoot();
+    const store = createAppStore({ jobs: [
+      { id: 'job-1', company: 'OpenAI', position: 'Product Intern', batch: '日常实习', stage: '关注' },
+    ] });
+    const service = { create: vi.fn(), move: vi.fn().mockResolvedValue(undefined), remove: vi.fn() };
+
+    initJobsController({ root, store, service, showToast: vi.fn() });
+    const stageControl = root.querySelector('[data-job-action="stage"]');
+    stageControl.value = '已投递';
+    stageControl.dispatchEvent(new Event('change', { bubbles: true }));
+
+    await vi.waitFor(() => expect(service.move).toHaveBeenCalledWith('job-1', '已投递', null));
+  });
+
   it('delegates detail and delete actions to persistent handlers', async () => {
     const root = createRoot();
     const store = createAppStore({ jobs: [{ id: 'job-1', company: 'OpenAI', position: 'Product Intern', batch: '日常实习', stage: '关注' }] });

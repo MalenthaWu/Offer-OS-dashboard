@@ -4,7 +4,7 @@ Offer OS 是一个浏览器本地优先的求职工作台。当前第一切片�
 
 ## 本地运行
 
-需要 Node.js 20 或更高版本。
+推荐使用 Node.js 22.12+ 的 LTS 版本。若使用 Node 20，至少需要 Node.js 20.19+；Node.js 21 不在 Vite 7 支持范围内。
 
 ```bash
 npm install

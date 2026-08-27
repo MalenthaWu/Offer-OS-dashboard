@@ -1,9 +1,13 @@
 import { readFileSync } from 'node:fs';
+import { JSDOM } from 'jsdom';
 import { describe, expect, it } from 'vitest';
 import playwrightConfig from '../../playwright.config.js';
 
 const html = readFileSync(new URL('../../index.html', import.meta.url), 'utf8');
 const legacyApp = readFileSync(new URL('../../src/legacy/legacy-app.js', import.meta.url), 'utf8');
+const readme = readFileSync(new URL('../../README.md', import.meta.url), 'utf8');
+const packageJson = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
+const document = new JSDOM(html).window.document;
 
 describe('Vite shell', () => {
   it('covers the first slice at desktop, tablet, and mobile widths', () => {
@@ -26,29 +30,50 @@ describe('Vite shell', () => {
     expect(playwrightConfig.webServer.command).toContain('--port 4174');
   });
 
+  it('uses cross-platform Playwright commands', () => {
+    expect(packageJson.scripts['test:e2e']).toBe('playwright test');
+    expect(playwrightConfig.webServer.command).toBe('npm run dev -- --host 127.0.0.1 --port 4174');
+    expect(playwrightConfig.webServer.command).not.toContain('env -u');
+  });
+
   it('keeps the legacy fallback JD tags mutable for Vite dependency scanning', () => {
     expect(legacyApp).toContain('const p = position.toLowerCase(); let tags = [];');
   });
 
+  it('describes local demo access without verification or sync claims', () => {
+    expect(legacyApp).not.toContain('邮箱已验证');
+    expect(legacyApp).not.toContain('手机已验证');
+    expect(legacyApp).not.toContain('多设备间同步');
+    expect(legacyApp).toContain('本地演示访问');
+    expect(legacyApp).toContain('数据只保存在当前浏览器');
+  });
+
+  it('documents the Node versions supported by the locked Vite major', () => {
+    expect(readme).toContain('Node.js 22.12+');
+    expect(readme).toContain('Node.js 20.19+');
+    expect(readme).toContain('Node.js 21 不在 Vite 7 支持范围内');
+    expect(readme).not.toContain('Node.js 20 或更高版本');
+  });
+
   it('preserves each main workspace exactly once', () => {
     for (const id of ['page-dashboard', 'page-jobs', 'page-resume', 'page-interview', 'page-review']) {
-      expect(html.split(`id="${id}"`)).toHaveLength(2);
+      expect(document.querySelectorAll(`#${id}`)).toHaveLength(1);
     }
   });
 
   it('keeps the dashboard first-slice elements exactly once', () => {
     for (const selector of [
-      'id="heatmap-card"',
-      'class="next-moment-compact"',
-      'class="panel month-agenda"',
-      'id="month-days"',
+      '#heatmap-card',
+      '.next-moment-compact',
+      '.month-agenda',
+      '#month-days',
     ]) {
-      expect(html.split(selector)).toHaveLength(2);
+      expect(document.querySelectorAll(selector)).toHaveLength(1);
     }
   });
 
   it('loads only the module entry', () => {
-    expect(html).toContain('<script type="module" src="/src/main.js"></script>');
-    expect(html).not.toMatch(/<style>[\s\S]+<\/style>/);
+    expect(document.querySelectorAll('script[type="module"][src="/src/main.js"]')).toHaveLength(1);
+    expect(document.querySelectorAll('style')).toHaveLength(0);
   });
 });

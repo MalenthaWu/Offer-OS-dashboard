@@ -1868,7 +1868,7 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
         const avatar = user ? user.initials : (profile.nickname ? profile.nickname.trim().slice(0, 2).toUpperCase() : DEFAULT_PROFILE.avatar);
         $('#profile-name').textContent = name;
         $('#profile-avatar').textContent = avatar;
-        $('#profile-sub').textContent = profile.direction ? '方向 · ' + profile.direction : (user ? (user.method === 'email' ? '邮箱已验证' : '手机已验证') : DEFAULT_PROFILE.sub);
+        $('#profile-sub').textContent = profile.direction ? '方向 · ' + profile.direction : (user ? '本地演示访问' : DEFAULT_PROFILE.sub);
         const _dt = $('#dashboard-title');
         if (_dt) _dt.textContent = '早上好，' + name;
       }
@@ -1877,11 +1877,11 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
         const user = loadAuth();
         if (user) {
           $settingsAccountRow.innerHTML = '<span class="user-avatar lg">' + escapeHtml(user.initials) + '</span>' +
-            '<div class="settings-account-info"><strong>' + escapeHtml(loadProfile().nickname || user.display) + '</strong><span>' + escapeHtml(maskAccount(user.account)) + ' · ' + (user.method === 'email' ? '邮箱验证码' : '手机短信') + '</span></div>' +
+            '<div class="settings-account-info"><strong>' + escapeHtml(loadProfile().nickname || user.display) + '</strong><span>' + escapeHtml(maskAccount(user.account)) + ' · 本地演示访问，数据只保存在当前浏览器</span></div>' +
             '<button class="secondary-button" type="button" id="st-logout">退出登录</button>';
         } else {
           $settingsAccountRow.innerHTML = '<span class="user-avatar lg">?</span>' +
-            '<div class="settings-account-info"><strong>尚未登录</strong><span>登录后可在多设备间同步你的求职数据</span></div>' +
+            '<div class="settings-account-info"><strong>尚未进入演示</strong><span>本地演示访问只解锁当前浏览器，不提供云端账号或跨设备同步</span></div>' +
             '<button class="primary-button" type="button" id="st-login">立即登录</button>';
         }
       }
@@ -1982,6 +1982,10 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
       const $loginPhonePane = $('#login-phone-pane');
       const DEFAULT_PROFILE = { avatar: 'XR', name: '欣睿', sub: 'AI 产品 · 增长实习' };
 
+      $('.login-intro').textContent = '这是本地演示访问：验证码由页面直接生成，数据只保存在当前浏览器。';
+      $('.login-foot').textContent = '进入演示不会创建云端账号，也不会验证邮箱或手机号。';
+      $loginSubmit.textContent = '进入本地演示';
+
       let loginMethod = 'email';
       let sentCode = null;
       let countdownTimer = null;
@@ -2021,7 +2025,7 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
         }
         $('#profile-avatar').textContent = user.initials;
         $('#profile-name').textContent = user.display;
-        $('#profile-sub').textContent = user.method === 'email' ? '邮箱已验证' : '手机已验证';
+        $('#profile-sub').textContent = '本地演示访问';
         renderIdentity();
       }
 
@@ -2051,11 +2055,10 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
           if (!/^1[3-9]\d{9}$/.test(acc)) { showToast('请输入有效的 11 位手机号'); $loginPhone.focus(); return; }
         }
         sentCode = String(Math.floor(100000 + Math.random() * 900000));
-        const label = isEmail ? '邮箱' : '短信';
         const demo = isEmail ? $loginDemoEmail : $loginDemoPhone;
         demo.hidden = false;
-        demo.textContent = '（演示）已向 ' + maskAccount(acc) + ' 发送' + label + '验证码：' + sentCode;
-        showToast(label + '验证码已发送（演示模式）');
+        demo.textContent = '本地演示验证码（未发送至 ' + maskAccount(acc) + '）：' + sentCode;
+        showToast('已生成本地演示验证码');
         startCountdown(isEmail ? $loginSendEmail : $loginSendSms);
       }
 
@@ -2088,7 +2091,7 @@ import { createResumeJobOption } from '../modules/jobs/resume-job-option.js';
         persistAuth(user);
         applyAuth(user);
         hideGate();
-        showToast('登录成功 · ' + maskAccount(acc));
+        showToast('已进入本地演示 · ' + maskAccount(acc));
       }
 
       $loginTabs.addEventListener('click', (e) => {

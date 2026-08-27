@@ -233,6 +233,16 @@ describe('local JSON backup', () => {
       payload.stores.jobs[0].metadata = JSON.parse('{"__proto__":"unsafe"}');
       return payload;
     }],
+    ['an impossible exportedAt calendar date', () => JSON.parse(JSON.stringify(validPayload({ exportedAt: '2026-02-31T00:00:00.000Z' })))],
+    ['an impossible job createdAt calendar date', () => JSON.parse(JSON.stringify(validPayload({ stores: {
+      jobs: [validJob({ createdAt: '2026-02-31T00:00:00.000Z' })], activities: [validActivity()],
+    } })))],
+    ['an impossible job updatedAt calendar date', () => JSON.parse(JSON.stringify(validPayload({ stores: {
+      jobs: [validJob({ updatedAt: '2026-02-31T00:00:00.000Z' })], activities: [validActivity()],
+    } })))],
+    ['an impossible activity occurredAt calendar date', () => JSON.parse(JSON.stringify(validPayload({ stores: {
+      jobs: [validJob()], activities: [validActivity({ occurredAt: '2026-02-31T00:00:00.000Z' })],
+    } })))],
   ])('rejects %s before writing or reloading', async (_name, makePayload) => {
     const db = await openTestDatabase();
     await seed(db, { jobs: [validJob({ id: 'existing-job' })], activities: [validActivity({ id: 'existing-activity', jobId: null })] });

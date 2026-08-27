@@ -11,10 +11,12 @@ const ACTIVITY_FIELDS = new Set(['id', 'jobId', 'formerJobId', 'type', 'occurred
 const ENVELOPE_FIELDS = new Set(['app', 'schemaVersion', 'exportedAt', 'stores']);
 const STORES_FIELDS = new Set(['jobs', 'activities']);
 const DISALLOWED_RECORD_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
-const ISO_DATE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?(?:Z|[+-]\d{2}:\d{2})$/;
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
 function isValidISO(value) {
-  return typeof value === 'string' && ISO_DATE.test(value) && Number.isFinite(Date.parse(value));
+  if (typeof value !== 'string' || !ISO_DATE.test(value)) return false;
+  const date = new Date(value);
+  return Number.isFinite(date.getTime()) && date.toISOString() === value;
 }
 
 function isPlainDataRecord(record) {

@@ -32,5 +32,9 @@ export default defineConfig({
         viewport: { width: 390, height: 664 },
       },
     },
+    {
+      name: 'webkit-desktop-1440',
+      use: { ...devices['Desktop Safari'], viewport: { width: 1440, height: 900 } },
+    },
   ],
 });

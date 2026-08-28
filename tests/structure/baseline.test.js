@@ -15,6 +15,7 @@ describe('Vite shell', () => {
       'chromium-desktop-1440',
       'chromium-desktop-1024',
       'chromium-mobile-390',
+      'webkit-desktop-1440',
     ]);
   });
 

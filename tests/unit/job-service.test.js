@@ -155,4 +155,26 @@ describe('jobService', () => {
     await importBackup(db, backup, { mode: 'replace', jobService: service });
     expect(store.getState().activities.filter((activity) => activity.type === '跟进')).toHaveLength(1);
   });
+
+  it('reports a committed mutation distinctly when the post-commit refresh fails', async () => {
+    const db = await openTestDatabase();
+    const originalTransaction = db.transaction.bind(db);
+    db.transaction = (storeNames, mode) => {
+      if (storeNames === 'jobs' && mode === undefined) throw new Error('post-commit jobs refresh failed');
+      return originalTransaction(storeNames, mode);
+    };
+    const service = createJobService({
+      db,
+      store: createAppStore(),
+      clock: () => new Date('2026-08-26T08:00:00.000Z'),
+      idFactory: vi.fn().mockReturnValueOnce('j-committed').mockReturnValueOnce('a-committed'),
+    });
+
+    await expect(service.create({ company: 'OpenAI', position: 'Product Intern' }))
+      .rejects.toMatchObject({ committed: true });
+    db.transaction = originalTransaction;
+    await expect(createJobRepository(db).get('j-committed')).resolves.toMatchObject({
+      id: 'j-committed', company: 'OpenAI', position: 'Product Intern',
+    });
+  });
 });

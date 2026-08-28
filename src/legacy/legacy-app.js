@@ -605,7 +605,10 @@ import { isSafeExternalLink, openExternalLink } from '../security/external-links
             dlg.close();
             showToast('已记录一次跟进');
           } catch (error) {
-            showToast(`记录跟进失败：${error instanceof Error ? error.message : '未知错误'}`);
+            if (error?.committed) {
+              dlg.close();
+              showToast('已记录一次跟进，但界面刷新失败，请刷新页面确认。');
+            } else showToast(`记录跟进失败：${error instanceof Error ? error.message : '未知错误'}`);
           } finally {
             followButton.disabled = false;
           }

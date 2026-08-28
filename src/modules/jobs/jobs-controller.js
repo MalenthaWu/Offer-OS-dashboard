@@ -1,5 +1,6 @@
 import { renderJobs } from './jobs-view.js';
 import { isSafeExternalLink } from '../../security/external-links.js';
+import { isCommittedMutationError } from '../../app/committed-mutation.js';
 
 const asText = (value) => value == null ? '' : String(value);
 
@@ -43,6 +44,7 @@ function applyFilters(root) {
 }
 
 function failureMessage(error) {
+  if (isCommittedMutationError(error)) return `${error.operation || '数据'}已保存，但界面刷新失败，请刷新页面确认。`;
   return `保存失败：${error instanceof Error ? error.message : '未知错误'}`;
 }
 
@@ -95,6 +97,10 @@ export function initJobsController({ root, store, service, showToast, onFilter =
       dialog?.close?.();
       submittedForm.reset();
     } catch (error) {
+      if (isCommittedMutationError(error)) {
+        submittedForm.closest('dialog')?.close?.();
+        submittedForm.reset();
+      }
       onFailure(error);
     }
   };
@@ -129,7 +135,7 @@ export function initJobsController({ root, store, service, showToast, onFilter =
     try {
       await service.move(item.dataset.id, stage, null);
     } catch (error) {
-      control.value = item.dataset.stage;
+      if (!isCommittedMutationError(error)) control.value = item.dataset.stage;
       onFailure(error);
     }
   };

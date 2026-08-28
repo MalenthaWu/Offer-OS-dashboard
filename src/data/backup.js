@@ -1,5 +1,6 @@
 import { requestToPromise, runTransaction } from './db.js';
 import { isSafeExternalLink } from '../security/external-links.js';
+import { reloadAfterCommittedMutation } from '../app/committed-mutation.js';
 
 const APP = 'offer-os';
 const SCHEMA_VERSION = 1;
@@ -140,5 +141,5 @@ export async function importBackup(db, payload, { mode, jobService } = {}) {
     stores.activities.forEach((activity) => activities.put(activity));
   });
 
-  await jobService?.reload?.();
+  if (jobService?.reload) await reloadAfterCommittedMutation(jobService.reload, '备份导入');
 }

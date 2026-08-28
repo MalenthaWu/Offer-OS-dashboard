@@ -60,16 +60,17 @@ describe('renderDashboard', () => {
   it('rebuilds an accessible 13 by 7 heatmap without interpreting tooltip text as HTML', () => {
     document.body.innerHTML = `
       <div class="dash-stat-grid">
-        <article class="dash-stat"><strong>0</strong><p>岗位总数</p></article>
-        <article class="dash-stat"><strong>0</strong><p>待投递</p></article>
-        <article class="dash-stat"><strong>0</strong><p>已投递</p></article>
-        <article class="dash-stat"><strong>0</strong><p>已结束</p></article>
+        <article class="dash-stat"><strong>0</strong><em>全部岗位</em><p>岗位总数</p></article>
+        <article class="dash-stat"><strong>0</strong><em>高优先 93 个</em><p>待投递</p></article>
+        <article class="dash-stat"><strong>0</strong><em>流程中</em><p>已投递</p></article>
+        <article class="dash-stat"><strong>0</strong><em>Offer / 已挂</em><p>已结束</p></article>
       </div>
       <div id="heat-grid"></div><div id="heat-tip"></div>`;
     const summary = computeDashboard({
       today: localTime(2026, 7, 26),
       jobs: [
-        { stage: '关注' }, { stage: '已投递' }, { stage: '已投递' }, { stage: '已结束' },
+        { stage: '关注', priority: 'P1' }, { stage: '已投递', priority: 'P0' },
+        { stage: '已投递', priority: 'P2' }, { stage: '已结束' },
       ],
       activities: [
         { type: '投递', occurredAt: localTime(2026, 7, 24, 9).toISOString() },
@@ -90,6 +91,8 @@ describe('renderDashboard', () => {
     expect(summary.heatmap.totalApplications).toBe(3);
     expect([...document.querySelectorAll('.dash-stat strong')].map((node) => node.textContent))
       .toEqual(['4', '1', '3', '1']);
+    expect([...document.querySelectorAll('.dash-stat em')].map((node) => node.textContent))
+      .toEqual(['全部岗位', '高优先 2 个', '近 91 天投递 3 次', '流程已结束']);
 
     today.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
     expect(document.querySelector('#heat-tip').textContent).toBe('2026-08-26，1 次投递');

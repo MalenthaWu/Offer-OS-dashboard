@@ -1,4 +1,5 @@
 import { exportBackup as exportLocalBackup, importBackup as importLocalBackup } from '../../data/backup.js';
+import { isCommittedMutationError } from '../../app/committed-mutation.js';
 
 const REPLACE_CONFIRMATION = '覆盖导入会覆盖本地岗位和活动，确认继续吗？';
 
@@ -118,7 +119,8 @@ export function initLocalDataControls({
       await importBackup(db, payload, { mode, jobService });
       showToast(mode === 'replace' ? '本地岗位和活动已覆盖导入' : '本地数据已合并导入');
     } catch (error) {
-      showToast(`导入失败：${error instanceof Error ? error.message : '未知错误'}`);
+      if (isCommittedMutationError(error)) showToast('备份已导入，但界面刷新失败，请刷新页面确认。');
+      else showToast(`导入失败：${error instanceof Error ? error.message : '未知错误'}`);
     } finally {
       fileInput.value = '';
       fileInput.disabled = false;

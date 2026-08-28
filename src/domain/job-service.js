@@ -2,6 +2,7 @@ import { createActivityRepository } from '../data/activity-repository.js';
 import { requestToPromise, runTransaction } from '../data/db.js';
 import { createJobRepository } from '../data/job-repository.js';
 import { SCHEMA_VERSION } from '../data/schema.js';
+import { reloadAfterCommittedMutation } from '../app/committed-mutation.js';
 
 const activityByStage = Object.freeze({
   '关注': '关注',
@@ -73,7 +74,7 @@ export function createJobService({ db, store, clock = () => new Date(), idFactor
       jobsStore.put(job);
       tx.objectStore('activities').put(activity);
     });
-    await reload();
+    await reloadAfterCommittedMutation(reload, '岗位创建');
     return job;
   }
 
@@ -96,7 +97,7 @@ export function createJobService({ db, store, clock = () => new Date(), idFactor
       });
       jobsStore.put(job);
     });
-    await reload();
+    await reloadAfterCommittedMutation(reload, '岗位修改');
     return job;
   }
 
@@ -134,7 +135,7 @@ export function createJobService({ db, store, clock = () => new Date(), idFactor
         tx.objectStore('activities').put(activityForStage({ id: idFactory(), jobId: id, stage, occurredAt }));
       }
     });
-    await reload();
+    await reloadAfterCommittedMutation(reload, '岗位状态变更');
     return moved;
   }
 
@@ -147,7 +148,7 @@ export function createJobService({ db, store, clock = () => new Date(), idFactor
       });
       tx.objectStore('jobs').delete(id);
     });
-    await reload();
+    await reloadAfterCommittedMutation(reload, '岗位删除');
   }
 
   async function recordFollowUp(id) {
@@ -165,7 +166,7 @@ export function createJobService({ db, store, clock = () => new Date(), idFactor
       if (!job) throw new Error(`Job not found: ${id}`);
       tx.objectStore('activities').put(activity);
     });
-    await reload();
+    await reloadAfterCommittedMutation(reload, '跟进记录');
     return activity;
   }
 

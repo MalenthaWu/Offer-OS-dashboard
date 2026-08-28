@@ -38,6 +38,7 @@ export function computeDashboard({ jobs = [], activities = [], today = new Date(
   const start = new Date(localToday);
   start.setDate(start.getDate() - 90);
   const stageCounts = Object.fromEntries(DASHBOARD_STAGES.map((stage) => [stage, 0]));
+  const highPriorityJobs = jobs.filter((job) => ['P0', 'P1'].includes(String(job?.priority || '').toUpperCase())).length;
   const days = Array.from({ length: 91 }, (_, index) => {
     const date = new Date(start);
     date.setDate(start.getDate() + index);
@@ -62,6 +63,7 @@ export function computeDashboard({ jobs = [], activities = [], today = new Date(
 
   return {
     totalJobs: jobs.length,
+    highPriorityJobs,
     stageCounts,
     heatmap: {
       days,

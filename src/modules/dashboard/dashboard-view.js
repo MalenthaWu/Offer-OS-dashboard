@@ -25,6 +25,15 @@ function updateStatistics(root, summary) {
     const value = statisticValues(summary)[index];
     if (value != null) node.textContent = String(value);
   });
+  const details = [
+    '全部岗位',
+    `高优先 ${summary.highPriorityJobs || 0} 个`,
+    `近 91 天投递 ${summary.heatmap.totalApplications} 次`,
+    '流程已结束',
+  ];
+  root.querySelectorAll('.dash-stat em').forEach((node, index) => {
+    if (details[index] != null) node.textContent = details[index];
+  });
 }
 
 function updateHeatLabels(root, days, doc) {

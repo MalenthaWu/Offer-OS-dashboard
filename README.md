@@ -23,6 +23,16 @@ npm run build
 
 `npm test` 运行单元与结构测试；`npm run test:e2e` 会在 Chromium 的 1440px、1024px 和 390px 视口中验证登录、岗位持久化和仪表盘同步；`npm run build` 生成 Vite 生产构建。
 
+## GitHub Pages 与兼容性
+
+发布项目页面时，请只部署 `dist/` 目录，不要把原始 `offer-os.html` 当作发布入口。若站点路径是 `https://<user>.github.io/<repository>/`，构建时传入仓库路径：
+
+```bash
+VITE_BASE=/<repository>/ npm run build
+```
+
+本地已验证 Chromium（桌面 / 手机）与 WebKit（Safari 内核）。Microsoft Edge 未安装在当前机器，发布前请在 Edge 中完成一次登录、添加岗位、刷新保存和备份导出的手工验收。
+
 ## 数据与备份
 
 岗位、活动和第一切片的数据存放在当前浏览器的 IndexedDB 中，只存在于这个浏览器配置文件和这台设备。刷新页面不会清除数据；清除站点数据、使用隐私浏览窗口或切换浏览器则会失去这份本地数据。

@@ -71,6 +71,7 @@ function createTableCell(content, className) {
 
 function createJobTableRow(job) {
   const stage = asText(job.stage || '关注');
+  const priority = asText(job.priority).toUpperCase();
   const row = document.createElement('tr');
   row.dataset.jobSearch = '';
   row.dataset.id = asText(job.id);
@@ -79,7 +80,11 @@ function createJobTableRow(job) {
   row.dataset.batch = asText(job.batch);
   row.dataset.base = asText(job.base);
   row.dataset.stage = stage;
+  row.dataset.priority = priority;
+  row.dataset.email = asText(job.email);
   row.dataset.applyLink = asText(job.applyLink ?? job.apply_link);
+  row.dataset.referral = asText(job.referral ?? job.referral_code);
+  row.dataset.other = asText(job.other);
   row.dataset.jdRaw = asText(job.jdRaw ?? job.jd);
   row.dataset.jdFormatted = asText(job.jdFormatted);
 
@@ -101,11 +106,13 @@ function createJobTableRow(job) {
   remove.setAttribute('aria-label', `删除${asText(job.company)} ${asText(job.position)}`.trim());
   const actions = createElement('div', 'table-job-actions');
   actions.append(details, remove);
+  const tags = createElement('div', 'job-tags');
+  if (priority) tags.append(createElement('span', `badge ${PRIORITY_CLASS[priority] || 'badge-pri-2'}`, priority));
 
   row.append(
     createTableCell(company),
     createTableCell(createStageControl(job)),
-    createTableCell(createElement('span', '', '—')),
+    createTableCell(tags),
     createTableCell(createElement('span', '', job.batch || '—')),
     createTableCell(createElement('span', '', job.base || '—')),
     createTableCell(createElement('span', '', job.applyLink ?? job.apply_link ? '已保存链接' : '—')),

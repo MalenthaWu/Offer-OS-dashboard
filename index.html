@@ -56,53 +56,6 @@
     <symbol id="i-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
   </svg>
 
-  <div id="login-gate" class="login-gate" hidden>
-    <div class="login-gate-card">
-      <div class="login-gate-brand">
-        <span class="login-gate-mark">OS</span>
-        <div><strong>Offer OS</strong><span>求职工作台</span></div>
-      </div>
-      <h1>登录，开始求职之旅</h1>
-      <p class="login-intro">支持邮箱或手机两种方式登录。验证码为<strong>演示模式</strong>自动生成，无需真实收发邮件 / 短信。</p>
-      <div class="segmented login-tabs" role="tablist" aria-label="登录方式" id="login-tabs">
-        <button class="segment active" type="button" data-login-method="email" role="tab"><svg class="icon icon-sm"><use href="#i-mail"/></svg>邮箱验证码</button>
-        <button class="segment" type="button" data-login-method="phone" role="tab"><svg class="icon icon-sm"><use href="#i-phone"/></svg>手机短信</button>
-      </div>
-
-      <div class="login-pane" id="login-email-pane">
-        <div class="login-field">
-          <label for="login-email">邮箱</label>
-          <input class="text-input" id="login-email" type="email" placeholder="you@example.com" autocomplete="off" />
-        </div>
-        <div class="login-field">
-          <label for="login-code-email">验证码</label>
-          <div class="login-input-row">
-            <input class="text-input" id="login-code-email" type="text" inputmode="numeric" maxlength="6" placeholder="6 位验证码" autocomplete="off" />
-            <button class="login-send-btn" type="button" id="login-send-email">获取验证码</button>
-          </div>
-          <p class="login-demo" id="login-demo-email" hidden></p>
-        </div>
-      </div>
-
-      <div class="login-pane" id="login-phone-pane" hidden>
-        <div class="login-field">
-          <label for="login-phone">手机号</label>
-          <input class="text-input" id="login-phone" type="tel" inputmode="numeric" maxlength="11" placeholder="13800138000" autocomplete="off" />
-        </div>
-        <div class="login-field">
-          <label for="login-code-phone">验证码</label>
-          <div class="login-input-row">
-            <input class="text-input" id="login-code-phone" type="text" inputmode="numeric" maxlength="6" placeholder="6 位验证码" autocomplete="off" />
-            <button class="login-send-btn" type="button" id="login-send-sms">获取短信验证码</button>
-          </div>
-          <p class="login-demo" id="login-demo-phone" hidden></p>
-        </div>
-      </div>
-
-      <button class="primary-button login-submit" type="button" id="login-submit">登录</button>
-      <p class="login-foot">登录即表示同意《用户协议》与《隐私政策》（原型占位）</p>
-    </div>
-  </div>
 
   <div class="app-shell">
     <aside class="sidebar" id="sidebar" aria-label="主导航">
@@ -137,8 +90,9 @@
 
       <div class="sidebar-spacer"></div>
         <div class="profile">
-          <div class="avatar" id="profile-avatar">XR</div>
-          <div class="profile-copy"><strong id="profile-name">欣睿</strong><span id="profile-sub">AI 产品 · 增长实习</span></div>
+          <!-- 个人信息占位：演示用，非真实资料，待用户填写 -->
+          <div class="avatar" id="profile-avatar">ST</div>
+          <div class="profile-copy"><strong id="profile-name">Starrr</strong><span id="profile-sub">AI 产品 · 增长实习</span></div>
           <button class="icon-button" type="button" id="profile-settings" aria-label="设置" title="设置" style="width:27px;height:27px;border:0;background:transparent"><svg class="icon icon-sm"><use href="#i-settings"/></svg></button>
         </div>
     </aside>
@@ -158,7 +112,7 @@
       <div class="content">
         <section class="page active" id="page-dashboard" aria-labelledby="dashboard-title">
           <div class="page-heading">
-            <div><p class="eyebrow">WED · AUG 26 · 2026</p><h1 id="dashboard-title">早上好，欣睿</h1><p>接下来最重要的不是投更多，而是把正在发生的机会推进好。</p></div>
+            <div><p class="eyebrow">WED · AUG 26 · 2026</p><h1 id="dashboard-title">早上好，Starrr</h1><p>接下来最重要的不是投更多，而是把正在发生的机会推进好。</p></div>
             <div class="heading-actions"><button class="secondary-button" type="button" data-section-jump="interview"><svg class="icon icon-sm"><use href="#i-mic"/></svg>练一场面试</button><button class="primary-button" type="button" data-section-jump="jobs"><svg class="icon icon-sm"><use href="#i-briefcase"/></svg>查看岗位</button></div>
           </div>
 
@@ -291,6 +245,26 @@
           </div>
 
           <div class="job-view" id="job-view-internships">
+            <div class="panel collect-direction">
+              <div class="panel-header"><h2>按你的方向搜集</h2><p>指定方向后，岗位搜索器据此从上述来源平台主动抓取并汇总到下方实习公司库</p></div>
+              <div class="collect-direction-body">
+                <div class="field-wrap collect-input"><svg class="icon icon-sm"><use href="#i-search"/></svg><input class="search-input" id="intern-direction" type="search" placeholder="输入你想搜集的方向，如 AI 产品经理 / 增长 / 商业化 / 数据分析" aria-label="搜集方向" /></div>
+                <button class="primary-button" type="button" id="intern-collect"><svg class="icon icon-sm"><use href="#i-zap"/></svg>按此方向搜集</button>
+              </div>
+              <div class="direction-chips" id="intern-chips">
+                <span class="direction-chips-label">快速试试：</span>
+                <button class="direction-chip" type="button" data-direction="AI 产品经理">AI 产品经理</button>
+                <button class="direction-chip" type="button" data-direction="增长产品">增长产品</button>
+                <button class="direction-chip" type="button" data-direction="商业化产品">商业化产品</button>
+                <button class="direction-chip" type="button" data-direction="社区产品">社区产品</button>
+                <button class="direction-chip" type="button" data-direction="策略产品">策略产品</button>
+                <button class="direction-chip" type="button" data-direction="数据分析">数据分析</button>
+              </div>
+              <div class="collect-direction-foot">
+                <span class="badge badge-gray" id="intern-current">当前搜集方向：未限定（展示全部来源）</span>
+                <span class="source-note">信息来源：以下平台的公开实习岗位，由岗位搜索器经 <strong>Playwright</strong> 自动抓取；实习公司库中每条岗位均标注来源平台与抓取时间。</span>
+              </div>
+            </div>
             <div class="internship-layout">
               <div class="panel"><div class="panel-header"><h2>找实习平台</h2><p>常用入口与定向搜索</p><span class="badge badge-gray header-end">8 个来源</span></div><div class="platform-grid">
                 <a class="platform-card" href="https://www.zhipin.com" target="_blank" rel="noreferrer"><strong>BOSS 直聘<svg class="icon icon-sm"><use href="#i-arrow"/></svg></strong><p>综合招聘 · 适合快速沟通与日常实习</p></a>
@@ -298,11 +272,15 @@
                 <a class="platform-card" href="https://www.nowcoder.com/jobs" target="_blank" rel="noreferrer"><strong>牛客网<svg class="icon icon-sm"><use href="#i-arrow"/></svg></strong><p>校招 / 实习 · 面经与网申进度</p></a>
                 <a class="platform-card" href="https://www.liepin.com" target="_blank" rel="noreferrer"><strong>猎聘<svg class="icon icon-sm"><use href="#i-arrow"/></svg></strong><p>综合招聘 · 产品与增长方向</p></a>
                 <a class="platform-card" href="https://www.51job.com" target="_blank" rel="noreferrer"><strong>前程无忧<svg class="icon icon-sm"><use href="#i-arrow"/></svg></strong><p>综合招聘 · 多行业校招岗位</p></a>
+                <a class="platform-card" href="https://www.ciweishixi.com" target="_blank" rel="noreferrer"><strong>刺猬实习<svg class="icon icon-sm"><use href="#i-arrow"/></svg></strong><p>实习垂直 · 名企远程与实地实习</p></a>
+                <a class="platform-card" href="https://www.shixiba.com" target="_blank" rel="noreferrer"><strong>实习吧<svg class="icon icon-sm"><use href="#i-arrow"/></svg></strong><p>实习聚合 · 多平台岗位汇总</p></a>
+                <a class="platform-card" href="https://www.haitou.cc" target="_blank" rel="noreferrer"><strong>海投网<svg class="icon icon-sm"><use href="#i-arrow"/></svg></strong><p>校招 · 宣讲会与批量投递</p></a>
               </div></div>
-              <div class="panel table-panel"><div class="panel-header"><h2>实习公司库</h2><p>岗位搜索器近 15 天搜集</p><div class="header-end"><span class="badge badge-mint">今日新增 6</span><button class="secondary-button" type="button" id="refresh-library" style="min-height:30px"><svg class="icon icon-sm"><use href="#i-refresh"/></svg>刷新机会</button></div></div><table class="data-table"><thead><tr><th>公司 / 岗位</th><th>批次</th><th>截止时间</th><th>情报摘要</th><th>抓取时间</th><th>操作</th></tr></thead><tbody>
-                <tr class="library-row" data-job-search data-company="小米" data-position="AI 产品实习生" data-batch="日常实习" data-favorite="false"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#f7e9df;--logo-ink:#a45e34">MI</span><div><strong>小米</strong><span>AI 产品实习生</span></div></div></td><td><span class="badge badge-gray">日常实习</span></td><td class="mono">09-10</td><td class="source-cell">负责大模型助手场景研究与需求推进，要求每周 4 天。</td><td class="mono">18 MIN</td><td><div class="library-actions"><button class="secondary-button pool-button" type="button">加入岗位池</button><button class="library-icon-button library-favorite" type="button" aria-label="收藏小米 AI 产品实习生" aria-pressed="false" title="收藏"><svg class="icon icon-sm"><use href="#i-star"/></svg></button><button class="library-icon-button library-delete" type="button" aria-label="删除小米 AI 产品实习生" title="删除"><svg class="icon icon-sm"><use href="#i-trash"/></svg></button></div></td></tr>
-                <tr class="library-row" data-job-search data-company="滴滴" data-position="用户增长产品实习生" data-batch="日常实习" data-favorite="true"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#f6e4e2;--logo-ink:#a64c42">DD</span><div><strong>滴滴</strong><span>用户增长产品实习生</span></div></div></td><td><span class="badge badge-gray">日常实习</span></td><td class="mono">09-06</td><td class="source-cell">参与增长策略设计、A/B 实验与转化漏斗分析。</td><td class="mono">2 H</td><td><div class="library-actions"><button class="secondary-button pool-button" type="button">加入岗位池</button><button class="library-icon-button library-favorite favorite" type="button" aria-label="取消收藏滴滴 用户增长产品实习生" aria-pressed="true" title="取消收藏"><svg class="icon icon-sm"><use href="#i-star"/></svg></button><button class="library-icon-button library-delete" type="button" aria-label="删除滴滴 用户增长产品实习生" title="删除"><svg class="icon icon-sm"><use href="#i-trash"/></svg></button></div></td></tr>
-                <tr class="library-row" data-job-search data-company="vivo" data-position="互联网产品经理" data-batch="秋招" data-favorite="false"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#e2ebf7;--logo-ink:#3c6690">V</span><div><strong>vivo</strong><span>互联网产品经理</span></div></div></td><td><span class="badge badge-blue">秋招</span></td><td class="mono">09-18</td><td class="source-cell">面向内容与服务生态，负责产品规划和跨团队落地。</td><td class="mono">YESTERDAY</td><td><div class="library-actions"><button class="secondary-button pool-button" type="button">加入岗位池</button><button class="library-icon-button library-favorite" type="button" aria-label="收藏 vivo 互联网产品经理" aria-pressed="false" title="收藏"><svg class="icon icon-sm"><use href="#i-star"/></svg></button><button class="library-icon-button library-delete" type="button" aria-label="删除 vivo 互联网产品经理" title="删除"><svg class="icon icon-sm"><use href="#i-trash"/></svg></button></div></td></tr>
+              <div class="panel table-panel"><div class="panel-header"><h2>实习公司库</h2><p>岗位搜索器经 Playwright 从上述平台自动抓取 · 近 15 天</p><div class="header-end"><span class="badge badge-mint">今日新增 6</span><button class="secondary-button" type="button" id="refresh-library" style="min-height:30px"><svg class="icon icon-sm"><use href="#i-refresh"/></svg>刷新机会</button></div></div><table class="data-table"><thead><tr><th>公司 / 岗位</th><th>批次</th><th>截止时间</th><th>情报摘要</th><th>抓取时间</th><th>来源</th><th>操作</th></tr></thead><tbody>
+                <tr class="library-row" data-job-search data-company="小米" data-position="AI 产品实习生" data-batch="日常实习" data-favorite="false"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#f7e9df;--logo-ink:#a45e34">MI</span><div><strong>小米</strong><span>AI 产品实习生</span></div></div></td><td><span class="badge badge-gray">日常实习</span></td><td class="mono">09-10</td><td class="source-cell">负责大模型助手场景研究与需求推进，要求每周 4 天。</td><td class="mono">18 MIN</td><td class="source-badge-cell"><span class="badge badge-gray">实习僧</span></td><td><div class="library-actions"><button class="secondary-button pool-button" type="button">加入岗位池</button><button class="library-icon-button library-favorite" type="button" aria-label="收藏小米 AI 产品实习生" aria-pressed="false" title="收藏"><svg class="icon icon-sm"><use href="#i-star"/></svg></button><button class="library-icon-button library-delete" type="button" aria-label="删除小米 AI 产品实习生" title="删除"><svg class="icon icon-sm"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr class="library-row" data-job-search data-company="滴滴" data-position="用户增长产品实习生" data-batch="日常实习" data-favorite="true"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#f6e4e2;--logo-ink:#a64c42">DD</span><div><strong>滴滴</strong><span>用户增长产品实习生</span></div></div></td><td><span class="badge badge-gray">日常实习</span></td><td class="mono">09-06</td><td class="source-cell">参与增长策略设计、A/B 实验与转化漏斗分析。</td><td class="mono">2 H</td><td class="source-badge-cell"><span class="badge badge-gray">BOSS 直聘</span></td><td><div class="library-actions"><button class="secondary-button pool-button" type="button">加入岗位池</button><button class="library-icon-button library-favorite favorite" type="button" aria-label="取消收藏滴滴 用户增长产品实习生" aria-pressed="true" title="取消收藏"><svg class="icon icon-sm"><use href="#i-star"/></svg></button><button class="library-icon-button library-delete" type="button" aria-label="删除滴滴 用户增长产品实习生" title="删除"><svg class="icon icon-sm"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr class="library-row" data-job-search data-company="vivo" data-position="互联网产品经理" data-batch="秋招" data-favorite="false"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#e2ebf7;--logo-ink:#3c6690">V</span><div><strong>vivo</strong><span>互联网产品经理</span></div></div></td><td><span class="badge badge-blue">秋招</span></td><td class="mono">09-18</td><td class="source-cell">面向内容与服务生态，负责产品规划和跨团队落地。</td><td class="mono">YESTERDAY</td><td class="source-badge-cell"><span class="badge badge-gray">牛客网</span></td><td><div class="library-actions"><button class="secondary-button pool-button" type="button">加入岗位池</button><button class="library-icon-button library-favorite" type="button" aria-label="收藏 vivo 互联网产品经理" aria-pressed="false" title="收藏"><svg class="icon icon-sm"><use href="#i-star"/></svg></button><button class="library-icon-button library-delete" type="button" aria-label="删除 vivo 互联网产品经理" title="删除"><svg class="icon icon-sm"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr class="library-row" data-job-search data-company="美团" data-position="数据分析实习生" data-batch="日常实习" data-favorite="false"><td><div class="company-cell"><span class="company-logo" style="--logo-bg:#f8edc9;--logo-ink:#796324">MT</span><div><strong>美团</strong><span>数据分析实习生</span></div></div></td><td><span class="badge badge-gray">日常实习</span></td><td class="mono">09-15</td><td class="source-cell">支持业务线搭建指标体系、用户分层与转化漏斗分析，输出数据洞察。</td><td class="mono">TODAY</td><td class="source-badge-cell"><span class="badge badge-gray">牛客网</span></td><td><div class="library-actions"><button class="secondary-button pool-button" type="button">加入岗位池</button><button class="library-icon-button library-favorite" type="button" aria-label="收藏美团 数据分析实习生" aria-pressed="false" title="收藏"><svg class="icon icon-sm"><use href="#i-star"/></svg></button><button class="library-icon-button library-delete" type="button" aria-label="删除美团 数据分析实习生" title="删除"><svg class="icon icon-sm"><use href="#i-trash"/></svg></button></div></td></tr>
               </tbody></table></div>
               <div class="empty-filter" id="internship-empty"><strong>没有匹配的实习机会</strong>试试更换搜索词或招聘批次。</div>
             </div>
@@ -360,7 +338,7 @@
                 <div class="settings-section">
                   <div class="settings-section-title"><svg class="icon icon-sm"><use href="#i-edit"/></svg>个人资料</div>
                   <div class="dialog-grid">
-                    <div class="form-field"><label for="st-nickname">昵称</label><input class="text-input" id="st-nickname" placeholder="如 欣睿" autocomplete="off" maxlength="20" /></div>
+                    <div class="form-field"><label for="st-nickname">昵称</label><input class="text-input" id="st-nickname" placeholder="如 Starrr" autocomplete="off" maxlength="20" /></div>
                     <div class="form-field"><label for="st-direction">岗位方向</label><input class="text-input" id="st-direction" placeholder="如 AI 产品经理" autocomplete="off" maxlength="30" /></div>
                   </div>
                   <p class="form-hint">昵称显示在顶栏与侧栏；岗位方向用于岗位搜索推荐与 JD 匹配。</p>
@@ -404,7 +382,8 @@
             </div></aside>
 
             <article class="panel resume-paper" id="resume-paper" contenteditable="false" aria-label="简历内容">
-              <h2 class="resume-name" id="resume-name">陈欣睿</h2><p class="resume-role" id="resume-role">AI 产品经理实习生 · 2027 届</p><div class="resume-contact"><span>Shanghai, CN</span><span>xinrui.pm@example.com</span><span>+86 138 0000 2026</span><span>portfolio.example.com</span></div><div class="resume-rule"></div>
+                            <!-- 个人信息占位：姓名改演示名，邮箱/手机/城市/作品集均改占位符，待用户填写 -->
+              <h2 class="resume-name" id="resume-name">Starrr</h2><p class="resume-role" id="resume-role">AI 产品经理实习生 · 2027 届</p><div class="resume-contact"><span>[所在城市]</span><span>[邮箱地址]</span><span>[手机号]</span><span>[作品集链接]</span></div><div class="resume-rule"></div>
               <section class="resume-section"><h3>Education · 教育经历</h3><div class="resume-item"><div class="resume-item-head"><strong>同济大学 · 信息管理与信息系统</strong><span>2023.09 — 2027.06</span></div><p>GPA 3.7/4.0 · 专业前 15% · 主修产品设计、数据分析、用户研究与机器学习基础</p></div></section>
               <section class="resume-section" id="experience-section"><h3>Experience · 实习经历</h3><div class="resume-item"><div class="resume-item-head"><strong id="resume-company">某头部内容平台 · 产品实习生</strong><span>2026.03 — 2026.08</span></div><ul id="resume-experience"><li>围绕 AI 搜索场景完成 18 次用户访谈，提炼 4 类核心意图并推动召回策略迭代。</li><li>搭建“曝光—点击—采纳”效果漏斗，定位回答采纳率瓶颈，推动核心指标提升 12.6%。</li><li>协同算法、设计和研发完成 3 个版本迭代，独立输出 PRD、埋点方案与上线复盘。</li></ul></div><div class="resume-item"><div class="resume-item-head"><strong>校园创业团队 · 增长负责人</strong><span>2025.06 — 2025.12</span></div><ul><li>从 0 到 1 设计冷启动增长实验，8 周内获取 3,200 名有效用户，次周留存提升至 31%。</li><li>建立渠道归因表与周度复盘机制，将单个有效用户获取成本降低 38%。</li></ul></div></section>
               <section class="resume-section"><h3>Projects · 项目经历</h3><div class="resume-item"><div class="resume-item-head"><strong>Offer OS · AI 求职工作台</strong><span>2026.08</span></div><p>定义岗位、日程、简历和模拟面试的一体化工作流，完成数据模型、信息架构和可交互原型；通过 JD 驱动简历建议和模拟面试问题。</p></div></section>
@@ -495,7 +474,7 @@
 
   <dialog id="tool-dialog"><div class="dialog-head"><h2 id="tool-dialog-title">工具详情</h2><button class="icon-button dialog-close" type="button" aria-label="关闭"><svg class="icon icon-sm"><use href="#i-x"/></svg></button></div><div class="dialog-body" id="tool-dialog-body"></div><div class="dialog-actions"><button class="secondary-button dialog-close" type="button">稍后</button><button class="primary-button" id="tool-primary" type="button">打开工具</button></div></dialog>
 
-  <aside class="assistant-drawer" id="assistant-drawer" aria-label="Career Copilot"><div class="drawer-head"><span class="assistant-icon"><svg class="icon icon-sm"><use href="#i-spark"/></svg></span><div class="drawer-title"><strong>Career Copilot</strong><span>结合你的岗位、简历和日程回答</span></div><button class="icon-button" id="close-assistant" type="button" aria-label="关闭助手"><svg class="icon icon-sm"><use href="#i-x"/></svg></button></div><div class="chat" id="chat"><div class="chat-date">今天 · 上下文已连接</div><div class="chat-bubble">下午好，欣睿。字节一面还有 38 小时。你可以让我帮你检查准备清单、拆一个案例题，或把刚才的模拟复盘改进项写进简历。</div></div><div class="quick-prompts"><button class="quick-prompt" type="button">检查字节面试准备</button><button class="quick-prompt" type="button">拆解小红书 JD</button><button class="quick-prompt" type="button">生成今晚复盘</button></div><form class="chat-compose" id="chat-form"><input class="text-input" id="chat-input" placeholder="问问你的求职工作台…" autocomplete="off" /><button class="primary-button" type="submit" aria-label="发送">发送</button></form></aside>
+  <aside class="assistant-drawer" id="assistant-drawer" aria-label="Career Copilot"><div class="drawer-head"><span class="assistant-icon"><svg class="icon icon-sm"><use href="#i-spark"/></svg></span><div class="drawer-title"><strong>Career Copilot</strong><span>结合你的岗位、简历和日程回答</span></div><button class="icon-button" id="close-assistant" type="button" aria-label="关闭助手"><svg class="icon icon-sm"><use href="#i-x"/></svg></button></div><div class="chat" id="chat"><div class="chat-date">今天 · 上下文已连接</div><div class="chat-bubble">下午好，Starrr。字节一面还有 38 小时。你可以让我帮你检查准备清单、拆一个案例题，或把刚才的模拟复盘改进项写进简历。</div></div><div class="quick-prompts"><button class="quick-prompt" type="button">检查字节面试准备</button><button class="quick-prompt" type="button">拆解小红书 JD</button><button class="quick-prompt" type="button">生成今晚复盘</button></div><form class="chat-compose" id="chat-form"><input class="text-input" id="chat-input" placeholder="问问你的求职工作台…" autocomplete="off" /><button class="primary-button" type="submit" aria-label="发送">发送</button></form></aside>
 
   <div class="toast" id="toast" role="status"><svg class="icon icon-sm"><use href="#i-check"/></svg><span id="toast-text">已完成</span></div>
 

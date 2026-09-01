@@ -6,3 +6,16 @@ playwright-report/
 test-results/
 .DS_Store
 *.log
+
+# Local agent and browser tooling
+.playwright-cli/
+.superpowers/
+.workbuddy/
+work/
+
+# Local API responses and one-off data scripts
+.base_*.json
+_backfill_selftest.py
+_create_tables.py
+_create_views.py
+_final_verify.py

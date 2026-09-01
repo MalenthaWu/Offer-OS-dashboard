@@ -465,7 +465,7 @@
     .company-cell span { display: block; margin-top: 2px; color: var(--muted); font-size: 9px; }
     .mono { font-family: var(--mono); font-size: 9px; color: var(--muted); }
     .internship-layout { display: grid; grid-template-columns: 1fr; gap: 12px; }
-    .platform-grid { padding: 12px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .platform-grid { padding: 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .platform-card { padding: 11px; min-height: 80px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-2); transition: .15s ease; }
     .platform-card:hover { background: #fff; border-color: var(--line-strong); transform: translateY(-1px); }
     .platform-card strong { display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; }
@@ -900,4 +900,20 @@
     .ai-draft .ai-note { margin: 8px 0 0; color: var(--muted); font-size: 8.5px; line-height: 1.5; }
     .llm-row { margin-bottom: 12px; }
     .llm-row label { display: block; margin-bottom: 5px; color: var(--muted); font-size: 9px; font-weight: 650; }
+
+    /* 实习信息搜集：按方向搜集环节 */
+    .collect-direction { margin-bottom: 12px; }
+    .collect-direction-body { padding: 12px 14px 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .collect-input { flex: 1 1 280px; }
+    .collect-input .search-input { width: 100%; }
+    #intern-collect { white-space: nowrap; }
+    .direction-chips { padding: 10px 14px 0; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .direction-chips-label { font-size: 10px; color: var(--muted); }
+    .direction-chip { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 4px 10px; font-size: 10.5px; cursor: pointer; transition: .15s ease; }
+    .direction-chip:hover { border-color: var(--blue-ink); color: var(--blue-ink); background: var(--blue); }
+    .collect-direction-foot { padding: 10px 14px 12px; margin-top: 10px; border-top: 1px solid var(--line); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    #intern-current { white-space: nowrap; }
+    .source-note { font-size: 10px; color: var(--muted); line-height: 1.55; flex: 1 1 280px; margin: 0; }
+    .source-note strong { color: var(--ink); }
+    .source-badge-cell { white-space: nowrap; }
   
